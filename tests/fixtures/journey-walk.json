@@ -1,0 +1,110 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "2026-11-02T01:39:03Z",
+  "usedSearchTime": "2026-11-02T01:39:00Z",
+  "refreshRateSeconds": 30,
+  "id": "9947bba8b9f0785add5b136006955170:9947bba8b9f0785add5b136006955170",
+  "journeys": [
+    {
+      "id": 0,
+      "journeyKey": "2;rO0ABXe3AQAAAEBLzS8an753QCoBiTdLxqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMQAAAAgAAAAKAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE5AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgxMjE2MDQxADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMTgwXzIwMjYxMTAx",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "from": {
+            "name": "Vald position",
+            "time": "2026-11-02T02:15:00Z"
+          },
+          "to": {
+            "name": "Malmö C",
+            "time": "2026-11-02T02:27:00Z",
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": false
+          },
+          "line": {
+            "name": "Gång",
+            "type": "Walk",
+            "lineNo": 0,
+            "color": "FFFFFFFF",
+            "outlineColor": "FF999593",
+            "iconColor": "FF3E3B39",
+            "towards": "",
+            "distance": "903 m",
+            "occupancySupport": false
+          },
+          "deviations": []
+        },
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000388330585|2026-11-01",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T02:27:00Z",
+            "pos": "Spår 4a",
+            "stopPointCoordinate": {
+              "lat": 55.609605,
+              "lon": 13.000299
+            },
+            "scheduledPos": "Spår 3a",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609685,
+              "lon": 13.000262
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Lund C",
+            "time": "2026-11-02T02:39:00Z",
+            "pos": "Spår 1",
+            "stopPointCoordinate": {
+              "lat": 55.706031,
+              "lon": 13.186895
+            },
+            "scheduledPos": "Spår 4",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.706003,
+              "lon": 13.186436
+            },
+            "coordinate": {
+              "lat": 55.706384,
+              "lon": 13.187015
+            },
+            "id2": "9021012081216000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1180",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Lund C",
+            "runNo": 1180,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201180"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-01"
+        }
+      ]
+    }
+  ],
+  "prevCursor": "MnxQUkVWSU9VU19QQUdFfDIwMjYtMTEtMDFUMTE6NTQ6MDBafHwxM2gzMG18U1RSRUVUX0FORF9BUlJJVkFMX1RJTUV8fHx8fHx8",
+  "nextCursor": "MnxORVhUX1BBR0V8MjAyNi0xMS0wMlQwNzozNDo1N1p8fDVofFNUUkVFVF9BTkRfQVJSSVZBTF9USU1FfGZhbHNlfDIwMjYtMTEtMDJUMDc6Mjc6NDZafDIwMjYtMTEtMDJUMDc6NTY6MDBafDB8NTMzMnx8",
+  "tooLongWalkJourneys": []
+}

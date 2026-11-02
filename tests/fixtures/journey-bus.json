@@ -1,0 +1,292 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "0001-01-01T00:00:00Z",
+  "usedSearchTime": "2026-11-02T01:26:00Z",
+  "refreshRateSeconds": 0,
+  "id": "6f77eed931ad389d4e23013d8412fd4e:6f77eed931ad389d4e23013d8412fd4e",
+  "journeys": [
+    {
+      "id": 0,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAJAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgxMTE2MDAxAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMTE3MDAyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDE3MTAwMDAxXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000385069668|2026-11-02",
+          "from": {
+            "name": "Lund Jupitergatan",
+            "time": "2026-11-02T05:09:00Z",
+            "pos": "Läge A",
+            "stopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "scheduledPos": "Läge A",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "coordinate": {
+              "lat": 55.699054,
+              "lon": 13.213757
+            },
+            "id2": "9021012081116000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Malmö Kungsgatan",
+            "time": "2026-11-02T05:26:00Z",
+            "pos": "Läge B",
+            "stopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "scheduledPos": "Läge B",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "coordinate": {
+              "lat": 55.600579,
+              "lon": 13.007166
+            },
+            "id2": "9021012080117000",
+            "timePoint": false
+          },
+          "line": {
+            "name": "Regionbuss",
+            "type": "Bus",
+            "no": "171",
+            "lineNo": 12000171,
+            "lineNoString": "ST:SE:276:Line:9011012017100000",
+            "color": "FFFEC900",
+            "outlineColor": "FFCC9B00",
+            "iconColor": "FF3E3B39",
+            "towards": "mot Malmö Södervärn",
+            "runNo": 1,
+            "subType": "Regional_Bus",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012017100001"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAJAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgxMTE2MDAxAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMTE3MDAyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDE3MTAwMDAzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000385069573|2026-11-02",
+          "from": {
+            "name": "Lund Jupitergatan",
+            "time": "2026-11-02T05:17:00Z",
+            "pos": "Läge A",
+            "stopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "scheduledPos": "Läge A",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "coordinate": {
+              "lat": 55.699054,
+              "lon": 13.213757
+            },
+            "id2": "9021012081116000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Malmö Kungsgatan",
+            "time": "2026-11-02T05:35:00Z",
+            "pos": "Läge B",
+            "stopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "scheduledPos": "Läge B",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "coordinate": {
+              "lat": 55.600579,
+              "lon": 13.007166
+            },
+            "id2": "9021012080117000",
+            "timePoint": false
+          },
+          "line": {
+            "name": "Regionbuss",
+            "type": "Bus",
+            "no": "171",
+            "lineNo": 12000171,
+            "lineNoString": "ST:SE:276:Line:9011012017100000",
+            "color": "FFFEC900",
+            "outlineColor": "FFCC9B00",
+            "iconColor": "FF3E3B39",
+            "towards": "mot Malmö Södervärn",
+            "runNo": 3,
+            "subType": "Regional_Bus",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012017100003"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAJAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgxMTE2MDAxAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMTE3MDAyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDE3MTAwMDA1XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000385069592|2026-11-02",
+          "from": {
+            "name": "Lund Jupitergatan",
+            "time": "2026-11-02T05:29:00Z",
+            "pos": "Läge A",
+            "stopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "scheduledPos": "Läge A",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "coordinate": {
+              "lat": 55.699054,
+              "lon": 13.213757
+            },
+            "id2": "9021012081116000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Malmö Kungsgatan",
+            "time": "2026-11-02T05:47:00Z",
+            "pos": "Läge B",
+            "stopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "scheduledPos": "Läge B",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "coordinate": {
+              "lat": 55.600579,
+              "lon": 13.007166
+            },
+            "id2": "9021012080117000",
+            "timePoint": false
+          },
+          "line": {
+            "name": "Regionbuss",
+            "type": "Bus",
+            "no": "171",
+            "lineNo": 12000171,
+            "lineNoString": "ST:SE:276:Line:9011012017100000",
+            "color": "FFFEC900",
+            "outlineColor": "FFCC9B00",
+            "iconColor": "FF3E3B39",
+            "towards": "mot Malmö Södervärn",
+            "runNo": 5,
+            "subType": "Regional_Bus",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012017100005"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAJAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgxMTE2MDAxAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMTE3MDAyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDE3MTAwMDA3XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000385069280|2026-11-02",
+          "from": {
+            "name": "Lund Jupitergatan",
+            "time": "2026-11-02T05:40:00Z",
+            "pos": "Läge A",
+            "stopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "scheduledPos": "Läge A",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.699035,
+              "lon": 13.213297
+            },
+            "coordinate": {
+              "lat": 55.699054,
+              "lon": 13.213757
+            },
+            "id2": "9021012081116000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Malmö Kungsgatan",
+            "time": "2026-11-02T05:58:00Z",
+            "pos": "Läge B",
+            "stopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "scheduledPos": "Läge B",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.599942,
+              "lon": 13.007592
+            },
+            "coordinate": {
+              "lat": 55.600579,
+              "lon": 13.007166
+            },
+            "id2": "9021012080117000",
+            "timePoint": false
+          },
+          "line": {
+            "name": "Regionbuss",
+            "type": "Bus",
+            "no": "171",
+            "lineNo": 12000171,
+            "lineNoString": "ST:SE:276:Line:9011012017100000",
+            "color": "FFFEC900",
+            "outlineColor": "FFCC9B00",
+            "iconColor": "FF3E3B39",
+            "towards": "mot Malmö Södervärn",
+            "runNo": 7,
+            "subType": "Regional_Bus",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012017100007"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    }
+  ],
+  "prevCursor": "MnxQUkVWSU9VU19QQUdFfDIwMjYtMTEtMDFUMTE6NDE6MDBafHwxM2gzMG18U1RSRUVUX0FORF9BUlJJVkFMX1RJTUV8fHx8fHx8",
+  "nextCursor": "MnxORVhUX1BBR0V8MjAyNi0xMS0wMlQxNDowMTowMFp8fDExaDMwbXxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXxmYWxzZXwyMDI2LTExLTAyVDEzOjU3OjAwWnwyMDI2LTExLTAyVDE0OjE3OjAwWnwwfDE5MjB8fA==",
+  "tooLongWalkJourneys": []
+}
