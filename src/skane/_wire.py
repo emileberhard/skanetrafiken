@@ -1,23 +1,33 @@
 import random
 import re
 import time
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
 from importlib.metadata import version
 from typing import Annotated
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 from pydantic import AwareDatetime, BaseModel, BeforeValidator, Field, StrictInt, ValidationError
 
-from skane._errors import InvalidResponseError, UnavailableError, UsageError
+from skane._errors import InvalidResponseError, SkaneError, UnavailableError, UsageError
 
 BASE = "https://www.skanetrafiken.se/gw-tps/api"
 VERSION = version("skane")
 DEADLINE_SECONDS = 30
+ATTEMPTS = 3
+REQUEST_SECONDS = 12
+LONGEST_RETRY_AFTER_SECONDS = 10
+HEADERS = {
+    "Search-Engine-Environment": "TjP",
+    "Accept-Language": "sv-SE",
+    "User-Agent": f"skane/{VERSION}",
+}
 
 
 def _meters(value: object) -> object:
@@ -121,6 +131,23 @@ class ErrorEnvelope(BaseModel):
     Error: ErrorDetail
 
 
+@dataclass(frozen=True, slots=True)
+class _Reply:
+    status: int
+    body: bytes
+    content_type: str
+    retry_after: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class _Retry:
+    after: float
+    reason: str
+
+
+type _Rule = Callable[[int, ErrorDetail | None, str], SkaneError | None]
+
+
 def _error_detail(data: bytes) -> ErrorDetail | None:
     try:
         return ErrorEnvelope.model_validate_json(data).Error
@@ -130,8 +157,11 @@ def _error_detail(data: bytes) -> ErrorDetail | None:
 
 def _message(path: str, status: int, detail: ErrorDetail | None) -> str:
     if detail is None:
-        return f"Skånetrafiken {path} returned HTTP {status}; Message: unavailable; Details: unavailable."
-    return f"Skånetrafiken {path} returned HTTP {status} ({detail.Code}): Message: {detail.Message}; Details: {detail.Details or 'none'}."
+        return f"Skånetrafiken {path} returned HTTP {status}."
+    return (
+        f"Skånetrafiken {path} returned HTTP {status} ({detail.Code}): "
+        f"Message: {detail.Message}; Details: {detail.Details or 'none'}."
+    )
 
 
 def _remaining(deadline: float) -> float:
@@ -143,96 +173,113 @@ def _remaining(deadline: float) -> float:
     return remaining
 
 
-def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], deadline: float) -> T:
-    url = BASE + path
-    if params:
-        url += "?" + urlencode(params)
-    request = Request(
-        url,
-        headers={
-            "Search-Engine-Environment": "TjP",
-            "Accept-Language": "sv-SE",
-            "User-Agent": f"skane/{VERSION}",
-        },
-    )
-    for attempt in range(3):
-        retry_after = 0.0
-        try:
-            with urlopen(request, timeout=min(12, _remaining(deadline))) as response:
-                data = response.read()
-            _remaining(deadline)
-            detail = _error_detail(data)
-            if detail is not None:
-                message = _message(path, 200, detail)
-                if detail.Source == "Client":
-                    raise UsageError(message)
-                raise UnavailableError(message)
-            try:
-                return model.model_validate_json(data)
-            except (ValidationError, ValueError) as exc:
-                raise InvalidResponseError(
-                    f"Skånetrafiken response for {path} is invalid; the API may have changed and skane needs repair: {str(exc)[:600]}"
-                ) from exc
-        except HTTPError as exc:
-            try:
-                detail = _error_detail(exc.read())
-                _remaining(deadline)
-            except (HTTPException, OSError) as read_error:
-                error = str(read_error)
-                if attempt < 2:
-                    time.sleep(min(random.uniform(0.2, 0.5) * 2**attempt, _remaining(deadline)))
-                continue
-            message = _message(path, exc.code, detail)
-            if exc.code in (404, 410) and path in ("/v2/Points", "/v2/Journey"):
-                raise InvalidResponseError(
-                    f"{message} The API endpoint may have changed; skane needs repair."
-                ) from exc
-            if detail and (
-                detail.Source == "Client"
-                or (
-                    path.startswith("/v3/RouteLink/")
-                    and detail.Code == "TPS5001"
-                    and detail.Details
-                    and "400" in detail.Details
-                    and "Invalid pattern of serviceJourneyId" in detail.Details
-                )
-            ):
-                raise UsageError(message) from exc
-            if exc.code < 500 and exc.code != 429:
-                raise UnavailableError(f"{message} Try again later.") from exc
-            error = message
-            header = exc.headers.get("Retry-After") if exc.headers else None
-            if header:
-                try:
-                    retry_after = max(0.0, float(header))
-                except ValueError:
-                    try:
-                        retry_after = max(
-                            0.0, (parsedate_to_datetime(header) - datetime.now(UTC)).total_seconds()
-                        )
-                    except (TypeError, ValueError, OverflowError):
-                        retry_after = 0.0
-                if retry_after > 10:
-                    raise UnavailableError(f"{message} Retry after {header}.") from exc
-        except (URLError, OSError, HTTPException) as exc:
-            error = str(exc)
-        if attempt < 2:
-            time.sleep(
-                min(max(retry_after, random.uniform(0.2, 0.5) * 2**attempt), _remaining(deadline))
+def _fetch(request: Request, timeout: float) -> _Reply:
+    try:
+        with urlopen(request, timeout=timeout) as response:
+            return _Reply(response.status, response.read(), response.headers.get_content_type(), None)
+    except HTTPError as exc:
+        return _Reply(
+            exc.code, exc.read(), exc.headers.get_content_type(), exc.headers.get("Retry-After")
+        )
+
+
+def _retry_after(header: str | None, now: datetime) -> float:
+    if not header:
+        return 0.0
+    try:
+        return max(0.0, float(header))
+    except ValueError:
+        pass
+    try:
+        return max(0.0, (parsedate_to_datetime(header) - now).total_seconds())
+    except (TypeError, ValueError, OverflowError):
+        return 0.0
+
+
+def _outcome[T: BaseModel](
+    path: str, reply: _Reply, model: type[T], rule: _Rule, now: datetime
+) -> T | _Retry:
+    if 200 <= reply.status < 300:
+        if reply.content_type != "application/json":
+            raise UnavailableError(
+                f"Skånetrafiken {path} answered with {reply.content_type} instead of JSON; "
+                "try again later."
             )
+        try:
+            return model.model_validate_json(reply.body)
+        except ValidationError as exc:
+            detail = _error_detail(reply.body)
+            if detail is None:
+                raise InvalidResponseError(
+                    f"Skånetrafiken response for {path} is invalid; the API may have changed "
+                    f"and skane needs repair: {str(exc)[:600]}"
+                ) from exc
+            error = UsageError if detail.Source == "Client" else UnavailableError
+            raise error(_message(path, reply.status, detail)) from None
+    detail = _error_detail(reply.body)
+    message = _message(path, reply.status, detail)
+    if (rejected := rule(reply.status, detail, message)) is not None:
+        raise rejected
+    if detail is not None and detail.Source == "Client":
+        raise UsageError(message)
+    if reply.status < 500 and reply.status != 429:
+        raise UnavailableError(f"{message} Try again later.")
+    wait = _retry_after(reply.retry_after, now)
+    if wait > LONGEST_RETRY_AFTER_SECONDS:
+        raise UnavailableError(f"{message} Retry after {reply.retry_after}.")
+    return _Retry(wait, message)
+
+
+def _get[T: BaseModel](
+    path: str, params: dict[str, str], model: type[T], deadline: float, rule: _Rule
+) -> T:
+    url = BASE + path + ("?" + urlencode(params) if params else "")
+    request = Request(url, headers=HEADERS)
+    reason = ""
+    for attempt in range(ATTEMPTS):
+        wait = 0.0
+        try:
+            reply = _fetch(request, min(REQUEST_SECONDS, _remaining(deadline)))
+        except (OSError, HTTPException) as exc:
+            reason = str(exc)
+        else:
+            _remaining(deadline)
+            outcome = _outcome(path, reply, model, rule, datetime.now(UTC))
+            if not isinstance(outcome, _Retry):
+                return outcome
+            wait, reason = outcome.after, outcome.reason
+        if attempt < ATTEMPTS - 1:
+            backoff = random.uniform(0.2, 0.5) * 2**attempt
+            time.sleep(min(max(wait, backoff), _remaining(deadline)))
     _remaining(deadline)
     raise UnavailableError(
-        f"Skånetrafiken {path} is unreachable or failing after retries: {error}; try again later."
+        f"Skånetrafiken {path} is unreachable or failing after retries: {reason}; try again later."
     )
+
+
+def _moved_endpoint(status: int, detail: ErrorDetail | None, message: str) -> SkaneError | None:
+    if status in (404, 410):
+        return InvalidResponseError(f"{message} The API endpoint may have changed; skane needs repair.")
+    return None
+
+
+def _malformed_leg_id(status: int, detail: ErrorDetail | None, message: str) -> SkaneError | None:
+    if (
+        detail is not None
+        and detail.Code == "TPS5001"
+        and "Invalid pattern of serviceJourneyId" in (detail.Details or "")
+    ):
+        return UsageError(message)
+    return None
 
 
 def points(query: str, deadline: float) -> list[Point]:
-    return get("/v2/Points", {"name": query}, Points, deadline).points
+    return _get("/v2/Points", {"name": query}, Points, deadline, _moved_endpoint).points
 
 
 def journey(params: dict[str, str], deadline: float) -> Journeys:
-    return get("/v2/Journey", params, Journeys, deadline)
+    return _get("/v2/Journey", params, Journeys, deadline, _moved_endpoint)
 
 
 def leg_stops(leg_id: str, deadline: float) -> TripStops:
-    return get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline)
+    return _get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline, _malformed_leg_id)
