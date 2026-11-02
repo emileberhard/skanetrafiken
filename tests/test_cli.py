@@ -3,7 +3,7 @@ import itertools
 import json
 import sys
 import threading
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from email.message import Message
 from http.client import IncompleteRead
 from pathlib import Path
@@ -306,20 +306,15 @@ def test_arrive_by_pages_backwards(monkeypatch, capsys):
     ]
 
 
-def test_dst_and_bare_time_means_today(monkeypatch):
-    class FixedDateTime(datetime):
-        @classmethod
-        def now(cls, tz=None):
-            return cls(2026, 11, 2, 22, 0, tzinfo=tz)
-
-    monkeypatch.setattr(cli, "datetime", FixedDateTime)
-    assert cli.local_time("08:00").isoformat() == "2026-11-02T08:00:00+01:00"
-    assert cli.local_time("2026-07-01 08:00").isoformat().endswith("+02:00")
-    assert cli.local_time("2026-12-01 08:00").isoformat().endswith("+01:00")
+def test_dst_and_bare_time_means_today():
+    today = date(2026, 11, 2)
+    assert cli.local_time("08:00", today).isoformat() == "2026-11-02T08:00:00+01:00"
+    assert cli.local_time("2026-07-01 08:00", today).isoformat().endswith("+02:00")
+    assert cli.local_time("2026-12-01 08:00", today).isoformat().endswith("+01:00")
     with pytest.raises(skane.UsageError):
-        cli.local_time("2026-10-25 02:30")
+        cli.local_time("2026-10-25 02:30", today)
     with pytest.raises(skane.UsageError):
-        cli.local_time("2026-03-29 02:30")
+        cli.local_time("2026-03-29 02:30", today)
 
 
 def test_walk_distance_and_train_mode(monkeypatch, capsys):
