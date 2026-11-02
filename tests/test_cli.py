@@ -7,6 +7,7 @@ from http.client import IncompleteRead
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlparse
+from urllib.response import addinfourl
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -35,12 +36,33 @@ def no_network(monkeypatch):
     monkeypatch.setattr(_wire, "urlopen", reject)
 
 
+def ok(value, url, content_type="application/json; charset=utf-8"):
+    headers = Message()
+    headers["Content-Type"] = content_type
+    body = value if isinstance(value, bytes) else json.dumps(value).encode()
+    return addinfourl(io.BytesIO(body), headers, url, 200)
+
+
+def http_error(url, status, **headers):
+    message = Message()
+    for name, value in headers.items():
+        message[name.replace("_", "-")] = value
+    return HTTPError(url, status, "error", message, io.BytesIO(b""))
+
+
 def respond(monkeypatch, response):
     def open_fixture(request, timeout):
         value = response(request.full_url) if callable(response) else response
-        return io.BytesIO(json.dumps(value).encode())
+        return ok(value, request.full_url)
 
     monkeypatch.setattr(_wire, "urlopen", open_fixture)
+
+
+def fail(monkeypatch, capsys, *args):
+    monkeypatch.setattr(sys, "argv", ["skane", *args, "--json"])
+    with pytest.raises(SystemExit) as exited:
+        cli.main()
+    return exited.value.code, json.loads(capsys.readouterr().out)["error"]
 
 
 def test_bus_json_contract_and_filter(monkeypatch, capsys):
@@ -417,7 +439,7 @@ def test_deadline_covers_pagination_and_retry(monkeypatch, capsys):
             raise TimeoutError("connection timed out")
         clock[0] += 10
         response["nextCursor"] = str(len(timeouts))
-        return io.BytesIO(json.dumps(response).encode())
+        return ok(response, request.full_url)
 
     monkeypatch.setattr(_wire.time, "monotonic", lambda: clock[0])
     monkeypatch.setattr(
@@ -522,3 +544,55 @@ def test_trip_notices_list_every_deviation_tag(monkeypatch, capsys):
     assert bus["legs"][0]["notices"][0].startswith("Turen går skoldagar.")
     assert train["notices"] == ["INSTÄLLD"]
     assert train["legs"][0]["notices"][0].startswith("Tåget är inställt Ystad station")
+
+
+def test_retry_after_paces_the_next_attempt(monkeypatch, capsys):
+    calls, sleeps = [], []
+
+    def throttled_once(request, timeout):
+        calls.append(request.full_url)
+        if len(calls) == 1:
+            raise http_error(request.full_url, 429, Retry_After="2")
+        return ok(fixture("points.json"), request.full_url)
+
+    monkeypatch.setattr(_wire, "urlopen", throttled_once)
+    monkeypatch.setattr(_wire.time, "sleep", sleeps.append)
+    result = invoke(monkeypatch, capsys, "stops", "Jupitergatan", "--json")
+    assert len(calls) == 2 and sleeps == [2.0]
+    assert any(place["id"] == "9021012081116000" for place in result)
+
+
+@pytest.mark.parametrize("retry_after", ["30", "Fri, 01 Jan 2100 00:00:00 GMT"])
+def test_distant_retry_after_fails_without_waiting(monkeypatch, capsys, retry_after):
+    calls = []
+
+    def throttled(request, timeout):
+        calls.append(request.full_url)
+        raise http_error(request.full_url, 503, Retry_After=retry_after)
+
+    monkeypatch.setattr(_wire, "urlopen", throttled)
+    code, error = fail(monkeypatch, capsys, "stops", "Lund")
+    assert (code, len(calls)) == (3, 1)
+    assert f"Retry after {retry_after}." in error["message"]
+
+
+def test_server_errors_retry_until_attempts_run_out(monkeypatch, capsys):
+    calls, sleeps = [], []
+
+    def failing(request, timeout):
+        calls.append(request.full_url)
+        raise http_error(request.full_url, 502)
+
+    monkeypatch.setattr(_wire, "urlopen", failing)
+    monkeypatch.setattr(_wire.time, "sleep", sleeps.append)
+    code, error = fail(monkeypatch, capsys, "stops", "Lund")
+    assert (code, len(calls), len(sleeps)) == (3, 3, 2)
+    assert "returned HTTP 502" in error["message"]
+
+
+def test_non_json_success_is_unavailable_not_a_changed_api(monkeypatch, capsys):
+    monkeypatch.setattr(
+        _wire, "urlopen", lambda request, timeout: ok(b"<html>", request.full_url, "text/html")
+    )
+    code, error = fail(monkeypatch, capsys, "stops", "Lund")
+    assert code == 3 and "text/html instead of JSON" in error["message"]
