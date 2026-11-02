@@ -4,7 +4,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime, time
+from datetime import date, datetime, time
 from typing import Never
 from zoneinfo import ZoneInfo
 
@@ -107,10 +107,10 @@ def parser() -> Parser:
     return p
 
 
-def local_time(value: str) -> datetime:
+def local_time(value: str, today: date) -> datetime:
     try:
         if re.fullmatch(r"\d{2}:\d{2}", value):
-            parsed = datetime.combine(datetime.now(ZONE).date(), time.fromisoformat(value))
+            parsed = datetime.combine(today, time.fromisoformat(value))
         elif not re.fullmatch(
             r"\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?", value
         ):
@@ -210,10 +210,11 @@ def _run(args: argparse.Namespace) -> None:
         else:
             _places(places)
     elif args.command == "trips":
+        today = datetime.now(ZONE).date()
         when = (
-            DepartAt(local_time(args.at))
+            DepartAt(local_time(args.at, today))
             if args.at
-            else ArriveBy(local_time(args.arrive_by))
+            else ArriveBy(local_time(args.arrive_by, today))
             if args.arrive_by
             else None
         )
