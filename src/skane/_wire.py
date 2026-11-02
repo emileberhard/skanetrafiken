@@ -12,10 +12,7 @@ from pydantic import AwareDatetime, BaseModel, Field, ValidationError
 BASE = "https://www.skanetrafiken.se/gw-tps/api"
 
 
-class SktError(Exception):
-    def __init__(self, code: int, message: str):
-        self.code = code
-        super().__init__(message)
+from skane._errors import InvalidResponseError, UnavailableError
 
 
 class Point(BaseModel):
@@ -104,7 +101,7 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
         headers={
             "Search-Engine-Environment": "TjP",
             "Accept-Language": "sv-SE",
-            "User-Agent": f"skt/{version}",
+            "User-Agent": f"skane/{version}",
         },
     )
     for attempt in range(3):
@@ -115,14 +112,12 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
             try:
                 return model.model_validate_json(data)
             except (ValidationError, ValueError) as exc:
-                raise SktError(
-                    4,
-                    f"Skånetrafiken response for {path} is invalid; the API may have changed and skt needs repair: {str(exc)[:600]}",
+                raise InvalidResponseError(
+                    f"Skånetrafiken response for {path} is invalid; the API may have changed and skane needs repair: {str(exc)[:600]}",
                 ) from exc
         except HTTPError as exc:
             if exc.code < 500 and exc.code != 429:
-                raise SktError(
-                    3,
+                raise UnavailableError(
                     f"Skånetrafiken {path} returned HTTP {exc.code}; check the request or try later.",
                 ) from exc
             error = exc
@@ -135,18 +130,17 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
                         retry_after = max(
                             0.0, (parsedate_to_datetime(header) - datetime.now(UTC)).total_seconds()
                         )
-                    except TypeError, ValueError, OverflowError:
+                    except (TypeError, ValueError, OverflowError):
                         retry_after = 0.0
                 if retry_after > 10:
-                    raise SktError(
-                        3, f"Skånetrafiken {path} asks to retry after {header}; try again later."
+                    raise UnavailableError(
+                        f"Skånetrafiken {path} asks to retry after {header}; try again later."
                     ) from exc
         except (URLError, TimeoutError, OSError) as exc:
             error = exc
         if attempt < 2:
             time.sleep(max(retry_after, random.uniform(0.2, 0.5) * 2**attempt))
-    raise SktError(
-        3,
+    raise UnavailableError(
         f"Skånetrafiken {path} is unreachable or failing after retries: {error}; try again later.",
     )
 

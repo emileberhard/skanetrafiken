@@ -6,7 +6,8 @@ from urllib.parse import parse_qs, urlparse
 
 import pytest
 
-from skt import api, cli
+from skane import UsageError, cli
+from skane import _wire as api
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -16,7 +17,7 @@ def fixture(name):
 
 
 def invoke(monkeypatch, capsys, *args):
-    monkeypatch.setattr(sys, "argv", ["skt", *args])
+    monkeypatch.setattr(sys, "argv", ["skane", *args])
     cli.main()
     return json.loads(capsys.readouterr().out)
 
@@ -81,7 +82,7 @@ def test_vehicle_detail_realtime_zero_and_nonzero(monkeypatch, capsys):
 
 def test_ambiguous_place_has_candidates_and_exit_2(monkeypatch, capsys):
     respond(monkeypatch, fixture("points.json"))
-    monkeypatch.setattr(sys, "argv", ["skt", "trips", "Jupitergatan", "123", "--json"])
+    monkeypatch.setattr(sys, "argv", ["skane", "trips", "Jupitergatan", "123", "--json"])
     with pytest.raises(SystemExit, match="2"):
         cli.main()
     error = json.loads(capsys.readouterr().out)["error"]
@@ -92,7 +93,7 @@ def test_ambiguous_place_has_candidates_and_exit_2(monkeypatch, capsys):
 
 def test_invalid_upstream_response_exits_4(monkeypatch, capsys):
     respond(monkeypatch, {"wrong": []})
-    monkeypatch.setattr(sys, "argv", ["skt", "stops", "Lund", "--json"])
+    monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
     with pytest.raises(SystemExit, match="4"):
         cli.main()
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
@@ -126,13 +127,13 @@ def test_line_filter_pages_and_deduplicates(monkeypatch, capsys):
 
 
 def test_dst_offsets_and_ambiguous_wall_time():
-    assert cli.iso(cli.local_time("2026-07-01 08:00")).endswith("+02:00")
-    assert cli.iso(cli.local_time("2026-12-01 08:00")).endswith("+01:00")
-    with pytest.raises(api.SktError):
+    assert cli.local_time("2026-07-01 08:00").isoformat().endswith("+02:00")
+    assert cli.local_time("2026-12-01 08:00").isoformat().endswith("+01:00")
+    with pytest.raises(UsageError):
         cli.local_time("2026-10-25 02:30")
-    with pytest.raises(api.SktError):
+    with pytest.raises(UsageError):
         cli.local_time("2026-03-29 02:30")
-    assert cli.iso(cli.local_time("2026-10-25T02:30:00+01:00")).endswith("+01:00")
+    assert cli.local_time("2026-10-25T02:30:00+01:00").isoformat().endswith("+01:00")
 
 
 def test_walk_distance_and_train_mode_from_live_response(monkeypatch, capsys):
@@ -183,7 +184,7 @@ def test_unavailable_api_retries_and_exits_3(monkeypatch, capsys):
 
     monkeypatch.setattr(api, "urlopen", unavailable)
     monkeypatch.setattr(api.time, "sleep", lambda seconds: None)
-    monkeypatch.setattr(sys, "argv", ["skt", "stops", "Lund", "--json"])
+    monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
     with pytest.raises(SystemExit, match="3"):
         cli.main()
     assert len(calls) == 3
@@ -205,3 +206,38 @@ def test_omits_departures_before_requested_time(monkeypatch, capsys):
         "--json",
     )
     assert result["trips"][0]["departure"] == "2026-11-02T03:35:00+01:00"
+
+
+def test_public_library_returns_immutable_models_with_cli_json(monkeypatch):
+    from dataclasses import FrozenInstanceError
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    from skane import Client, Trips
+
+    respond(monkeypatch, fixture("journey-bus.json"))
+    result = Client().trips(
+        "9021012081116000",
+        "9021012080117000",
+        at=datetime(2026, 11, 2, 0, 0, tzinfo=ZoneInfo("Europe/Stockholm")),
+        line="171",
+        count=1,
+    )
+    assert isinstance(result, Trips)
+    assert result.trips[0].departure == datetime(
+        2026, 11, 2, 6, 9, tzinfo=ZoneInfo("Europe/Stockholm")
+    )
+    assert json.loads(result.to_json())["trips"][0]["legs"][0]["from"]["delayMinutes"] is None
+    assert isinstance(result.trips, tuple)
+    field_name = "changes"
+    with pytest.raises(FrozenInstanceError):
+        setattr(result.trips[0], field_name, 1)
+
+
+def test_public_library_rejects_naive_time():
+    from datetime import datetime
+
+    from skane import Client, UsageError
+
+    with pytest.raises(UsageError, match="timezone"):
+        Client().trips("123", "456", at=datetime(2026, 11, 2, 8, 0))
