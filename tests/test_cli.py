@@ -49,6 +49,8 @@ def test_bus_json_contract_and_filter(monkeypatch, capsys):
         "171",
         "--count",
         "1",
+        "--at",
+        "2026-11-02T00:00+01:00",
         "--json",
     )
     journey = result["trips"][0]
@@ -115,6 +117,8 @@ def test_line_filter_pages_and_deduplicates(monkeypatch, capsys):
         "171",
         "--count",
         "1",
+        "--at",
+        "2026-11-02T00:00+01:00",
         "--json",
     )
     assert len(result["trips"]) == 1
@@ -153,6 +157,8 @@ def test_journey_preserves_live_delay_without_inventing_departure(monkeypatch, c
         "9021012045007000",
         "--count",
         "1",
+        "--at",
+        "2026-11-02T00:00+01:00",
         "--json",
     )
     journey = result["trips"][0]
@@ -182,3 +188,20 @@ def test_unavailable_api_retries_and_exits_3(monkeypatch, capsys):
         cli.main()
     assert len(calls) == 3
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
+
+
+def test_omits_departures_before_requested_time(monkeypatch, capsys):
+    respond(monkeypatch, fixture("journey-realtime.json"))
+    result = invoke(
+        monkeypatch,
+        capsys,
+        "trips",
+        "9021012080000000",
+        "9021012045007000",
+        "--at",
+        "2026-11-02 03:00",
+        "--count",
+        "1",
+        "--json",
+    )
+    assert result["trips"][0]["departure"] == "2026-11-02T03:35:00+01:00"
