@@ -1,8 +1,7 @@
 import io
 import json
-import subprocess
 import sys
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime
 from email.message import Message
 from http.client import IncompleteRead
 from pathlib import Path
@@ -24,7 +23,7 @@ def fixture(name):
 
 def invoke(monkeypatch, capsys, *args):
     monkeypatch.setattr(sys, "argv", ["skane", *args])
-    cli._run()
+    cli.main()
     return json.loads(capsys.readouterr().out)
 
 
@@ -96,10 +95,11 @@ def test_bus_json_contract_and_filter(monkeypatch, capsys):
 def test_leg_realtime_and_stop_flags(monkeypatch, capsys):
     raw = fixture("route-realtime.json")
     raw["stops"][0]["departure"].update(canceled=True, timeOmitted=True)
+    raw["stops"][1]["arrival"]["canceled"] = True
     respond(monkeypatch, raw)
     result = invoke(monkeypatch, capsys, "leg", "leg-id", "--json")
     first, second = result["stops"][:2]
-    assert first["cancelled"] is True
+    assert first["cancelled"] is True and second["cancelled"] is True
     assert first["departure"] == {
         "scheduled": "2026-11-02T02:21:00+01:00",
         "expected": None,
@@ -109,7 +109,7 @@ def test_leg_realtime_and_stop_flags(monkeypatch, capsys):
     assert second["arrival"]["expected"] == "2026-11-02T02:26:00+01:00"
     assert second["arrival"]["delayMinutes"] == -1
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id"])
-    cli._run()
+    cli.main()
     rendered = capsys.readouterr().out
     assert "CANCELLED" in rendered and "--:-- (scheduled 02:21)" in rendered
 
@@ -119,25 +119,27 @@ def test_on_time_and_timetable_are_distinct_in_human_output(monkeypatch, capsys)
     respond(monkeypatch, raw)
     args = ["skane", "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1"]
     monkeypatch.setattr(sys, "argv", args)
-    cli._run()
+    cli.main()
     assert "06:09 (scheduled)" in capsys.readouterr().out
     raw["journeys"][0]["routeLinks"][0]["from"]["deviation"] = 0
-    cli._run()
+    cli.main()
     assert "06:09 (on time)" in capsys.readouterr().out
 
 
 def test_ambiguous_place_has_structured_candidates_and_cli_exit_2(monkeypatch, capsys):
     respond(monkeypatch, fixture("points.json"))
     with pytest.raises(skane.AmbiguousPlaceError) as caught:
-        skane.trips("Jupitergatan", "123")
+        skane.trips("Jupitergatan", "123", skane.DepartAt(datetime(2026, 11, 2, tzinfo=UTC)))
     assert caught.value.query == "Jupitergatan"
     assert any(
         p.name == "Lund Jupitergatan" and p.id == "9021012081116000"
         for p in caught.value.candidates
     )
-    monkeypatch.setattr(sys, "argv", ["skane", "trips", "Jupitergatan", "123", "--json"])
+    monkeypatch.setattr(
+        sys, "argv", ["skane", "trips", "Jupitergatan", "123", "--at", "2026-11-02 00:00", "--json"]
+    )
     with pytest.raises(SystemExit, match="2"):
-        cli._run()
+        cli.main()
     error = json.loads(capsys.readouterr().out)["error"]
     assert error["code"] == 2 and "Lund Jupitergatan" in error["message"]
 
@@ -172,9 +174,11 @@ def test_invalid_upstream_response_and_boolean_delay_exit_4(monkeypatch, capsys)
     raw = fixture("journey-bus.json")
     raw["journeys"][0]["routeLinks"][0]["from"]["deviation"] = False
     respond(monkeypatch, raw)
-    monkeypatch.setattr(sys, "argv", ["skane", "trips", "123", "456", "--json"])
+    monkeypatch.setattr(
+        sys, "argv", ["skane", "trips", "123", "456", "--at", "2026-11-02 00:00", "--json"]
+    )
     with pytest.raises(SystemExit, match="4"):
-        cli._run()
+        cli.main()
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
 
 
@@ -234,32 +238,25 @@ def test_arrive_by_pages_backwards(monkeypatch, capsys):
     ]
 
 
-def test_dst_and_next_occurrence():
-    zone = ZoneInfo("Europe/Stockholm")
+def test_dst_and_bare_time_means_today(monkeypatch):
+    class FixedDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 11, 2, 22, 0, tzinfo=tz)
+
+    monkeypatch.setattr(cli, "datetime", FixedDateTime)
+    assert cli.local_time("08:00").isoformat() == "2026-11-02T08:00:00+01:00"
     assert cli.local_time("2026-07-01 08:00").isoformat().endswith("+02:00")
     assert cli.local_time("2026-12-01 08:00").isoformat().endswith("+01:00")
     with pytest.raises(skane.UsageError):
         cli.local_time("2026-10-25 02:30")
     with pytest.raises(skane.UsageError):
         cli.local_time("2026-03-29 02:30")
-    assert (
-        cli._next_occurrence(time(8), datetime(2026, 11, 2, 22, tzinfo=zone)).date().isoformat()
-        == "2026-11-03"
-    )
-    assert (
-        cli._next_occurrence(time(2, 30), datetime(2026, 10, 25, 0, 45, tzinfo=UTC)).isoformat()
-        == "2026-10-25T02:30:00+01:00"
-    )
-    assert (
-        cli._next_occurrence(time(2, 30), datetime(2026, 3, 29, 0, 0, tzinfo=UTC))
-        .date()
-        .isoformat()
-        == "2026-03-30"
-    )
 
 
 def test_walk_distance_and_train_mode(monkeypatch, capsys):
-    respond(monkeypatch, fixture("journey-walk.json"))
+    raw = fixture("journey-walk.json")
+    respond(monkeypatch, raw)
     result = invoke(
         monkeypatch,
         capsys,
@@ -275,6 +272,11 @@ def test_walk_distance_and_train_mode(monkeypatch, capsys):
     walk, train = result["trips"][0]["legs"]
     assert (walk["mode"], walk["distanceMeters"], walk["line"]) == ("walk", 903, None)
     assert train["mode"] == "train"
+    del raw["journeys"][0]["routeLinks"][0]["line"]["distance"]
+    result = invoke(
+        monkeypatch, capsys, "trips", "1", "2", "--at", "2026-11-02 03:00", "--count", "1", "--json"
+    )
+    assert result["trips"][0]["legs"][0]["distanceMeters"] is None
     assert skane._client._distance_meters("1,2 km") == 1200
     with pytest.raises(skane.InvalidResponseError):
         skane._client._distance_meters("unknown")
@@ -319,13 +321,16 @@ def test_error_envelopes_and_fixed_endpoint_404(monkeypatch, capsys):
 
     monkeypatch.setattr(_wire, "urlopen", fail)
     for args, message in [
-        (["trips", "123", "456", "--json"], "Departure point could not be found"),
+        (
+            ["trips", "123", "456", "--at", "2026-11-02 00:00", "--json"],
+            "Departure point could not be found",
+        ),
         (["leg", "bad", "--json"], "Invalid pattern of serviceJourneyId"),
     ]:
         calls.clear()
         monkeypatch.setattr(sys, "argv", ["skane", *args])
         with pytest.raises(SystemExit, match="2"):
-            cli._run()
+            cli.main()
         error = json.loads(capsys.readouterr().out)["error"]
         assert (
             message in error["message"]
@@ -340,7 +345,7 @@ def test_error_envelopes_and_fixed_endpoint_404(monkeypatch, capsys):
     monkeypatch.setattr(_wire, "urlopen", missing)
     monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
     with pytest.raises(SystemExit, match="4"):
-        cli._run()
+        cli.main()
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
 
 
@@ -355,20 +360,38 @@ def test_incomplete_read_retries_then_json_exit_3(monkeypatch, capsys):
     monkeypatch.setattr(_wire.time, "sleep", lambda seconds: None)
     monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
     with pytest.raises(SystemExit, match="3"):
-        cli._run()
+        cli.main()
     assert len(calls) == 3
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
 
 
-def test_command_deadline_maps_to_json_error(monkeypatch, capsys):
-    def timeout(*args, **kwargs):
-        assert kwargs["timeout"] < 30
-        raise subprocess.TimeoutExpired(args[0], kwargs["timeout"])
+def test_deadline_covers_pagination_and_retry(monkeypatch, capsys):
+    clock = [0.0]
+    timeouts = []
+    response = {"journeys": [], "nextCursor": "next"}
 
-    monkeypatch.setattr(cli.subprocess, "run", timeout)
-    monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
+    def open_page(request, timeout):
+        timeouts.append(timeout)
+        if len(timeouts) == 3:
+            clock[0] += 9.75
+            raise TimeoutError("connection timed out")
+        clock[0] += 10
+        response["nextCursor"] = str(len(timeouts))
+        return io.BytesIO(json.dumps(response).encode())
+
+    monkeypatch.setattr(_wire.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(
+        _wire.time, "sleep", lambda seconds: clock.__setitem__(0, clock[0] + seconds)
+    )
+    monkeypatch.setattr(_wire.random, "uniform", lambda low, high: 1.0)
+    monkeypatch.setattr(_wire, "urlopen", open_page)
+    monkeypatch.setattr(
+        sys, "argv", ["skane", "trips", "1", "2", "--at", "2026-11-02 00:00", "--json"]
+    )
     with pytest.raises(SystemExit, match="3"):
         cli.main()
+    assert timeouts == [12, 12, 10]
+    assert clock[0] == 30
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
 
 
@@ -377,8 +400,9 @@ def test_past_explicit_departure_and_aware_input(monkeypatch):
     when = skane.DepartAt(datetime(2026, 11, 2, 2, 0, tzinfo=ZoneInfo("Europe/Stockholm")))
     result = skane.trips("9021012080000000", "9021012045007000", when, count=1)
     assert result.trips[0].departure.isoformat() == "2026-11-02T02:35:00+01:00"
-    with pytest.raises(skane.UsageError, match="timezone"):
-        skane.trips("123", "456", skane.DepartAt(datetime(2026, 11, 2, 8, 0)))
+    for choice in (skane.DepartAt, skane.ArriveBy):
+        with pytest.raises(skane.UsageError, match="timezone"):
+            choice(datetime(2026, 11, 2, 8, 0))
 
 
 def test_mixed_line_trip_is_excluded(monkeypatch, capsys):
@@ -408,10 +432,10 @@ def test_leg_human_output_distinguishes_zero_from_missing(monkeypatch, capsys):
     raw = fixture("route-realtime.json")
     respond(monkeypatch, raw)
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id"])
-    cli._run()
+    cli.main()
     assert "02:21 (on time)" in capsys.readouterr().out
     del raw["stops"][0]["departure"]["deviation"]
-    cli._run()
+    cli.main()
     assert "02:21 (scheduled)" in capsys.readouterr().out
 
 
@@ -421,22 +445,8 @@ def test_leg_boolean_delay_is_invalid(monkeypatch, capsys):
     respond(monkeypatch, raw)
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id", "--json"])
     with pytest.raises(SystemExit, match="4"):
-        cli._run()
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
-
-
-def test_command_deadline_terminates_child(monkeypatch, capsys):
-    actual_run = subprocess.run
-
-    def slow_child(*args, **kwargs):
-        kwargs["timeout"] = 0.05
-        return actual_run([sys.executable, "-c", "import time; time.sleep(10)"], **kwargs)
-
-    monkeypatch.setattr(cli.subprocess, "run", slow_child)
-    monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
-    with pytest.raises(SystemExit, match="3"):
         cli.main()
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
 
 
 def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
@@ -451,5 +461,5 @@ def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
     monkeypatch.setattr(
         sys, "argv", ["skane", "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1"]
     )
-    cli._run()
+    cli.main()
     assert "--:-- (scheduled 06:09)" in capsys.readouterr().out

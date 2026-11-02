@@ -1,8 +1,10 @@
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
+from typing import Literal
 from zoneinfo import ZoneInfo
 
 from skane import _wire
@@ -28,10 +30,14 @@ ZONE = ZoneInfo("Europe/Stockholm")
 class _Place:
     id: str
     name: str
-    type: str
+    type: Literal["STOP_AREA", "LOCATION"]
 
 
 def stops(query: str) -> tuple[Place, ...]:
+    return _stops(query, time.monotonic() + _wire.DEADLINE_SECONDS)
+
+
+def _stops(query: str, deadline: float) -> tuple[Place, ...]:
     return tuple(
         Place(
             p.id2 if p.type == "STOP_AREA" else f"{p.lat},{p.lon}",
@@ -41,11 +47,11 @@ def stops(query: str) -> tuple[Place, ...]:
             p.lat,
             p.lon,
         )
-        for p in _wire.points(query)
+        for p in _wire.points(query, deadline)
     )
 
 
-def _resolve(query: str | Place) -> _Place:
+def _resolve(query: str | Place, deadline: float) -> _Place:
     if isinstance(query, Place):
         return _Place(
             query.id if query.type == "STOP_AREA" else f"{query.lat}#{query.lon}",
@@ -60,11 +66,11 @@ def _resolve(query: str | Place) -> _Place:
         if not (-90 <= lat <= 90 and -180 <= lon <= 180):
             raise UsageError(f"Invalid coordinates {query!r}.")
         return _Place(f"{lat}#{lon}", query, "LOCATION")
-    candidates = stops(query)
+    candidates = _stops(query, deadline)
     exact = [p for p in candidates if p.name.casefold() == query.casefold()]
     if len(exact) != 1:
         raise AmbiguousPlaceError(query, candidates)
-    return _resolve(exact[0])
+    return _resolve(exact[0], deadline)
 
 
 def _stop_time(stop: _wire.StopTime) -> StopTime:
@@ -82,8 +88,10 @@ def _stop_time(stop: _wire.StopTime) -> StopTime:
     )
 
 
-def _distance_meters(value: str | None) -> int:
-    match = re.fullmatch(r"\s*(\d+(?:[.,]\d+)?)\s*(m|km)\s*", value or "", re.IGNORECASE)
+def _distance_meters(value: str | None) -> int | None:
+    if value is None:
+        return None
+    match = re.fullmatch(r"\s*(\d+(?:[.,]\d+)?)\s*(m|km)\s*", value, re.IGNORECASE)
     if match:
         try:
             distance = Decimal(match.group(1).replace(",", ".")) * (
@@ -130,16 +138,16 @@ def trips(
     origin: str | Place,
     destination: str | Place,
     when: DepartAt | ArriveBy | None = None,
+    *,
     line: str | None = None,
     count: int = 5,
 ) -> Trips:
+    deadline = time.monotonic() + _wire.DEADLINE_SECONDS
     if count < 1:
         raise UsageError("count must be at least 1.")
     moment = when.time if when is not None else None
-    if moment is not None and (moment.tzinfo is None or moment.utcoffset() is None):
-        raise UsageError("Journey time must include a timezone.")
     with ThreadPoolExecutor(max_workers=2) as pool:
-        futures = [pool.submit(_resolve, q) for q in (origin, destination)]
+        futures = [pool.submit(_resolve, q, deadline) for q in (origin, destination)]
         start, end = (future.result() for future in futures)
     arrive_by = isinstance(when, ArriveBy)
     params = {
@@ -160,10 +168,10 @@ def trips(
             "+00:00", "Z"
         )
     found: list[Trip] = []
-    seen: set[tuple] = set()
+    seen: set[tuple[tuple[str | None, datetime], ...]] = set()
     cursors: set[str] = set()
     for _ in range(10):
-        page = _wire.journey(params)
+        page = _wire.journey(params, deadline)
         for journey in page.journeys:
             links = journey.routeLinks
             transit = [link for link in links if link.line.type.lower() != "walk"]
@@ -196,7 +204,6 @@ def trips(
 
 
 def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:
-    selected = stop.departure or stop.arrival
     return VehicleStop(
         stop.id,
         stop.name,
@@ -204,10 +211,10 @@ def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:
         stop.scheduledPos,
         _timing(stop.arrival),
         _timing(stop.departure),
-        selected.canceled if selected else False,
+        any(t.canceled for t in (stop.arrival, stop.departure) if t),
     )
 
 
 def leg_stops(leg_id: str) -> VehicleTrip:
-    response = _wire.leg_stops(leg_id)
+    response = _wire.leg_stops(leg_id, time.monotonic() + _wire.DEADLINE_SECONDS)
     return VehicleTrip(tuple(_vehicle_stop(stop) for stop in response.stops))
