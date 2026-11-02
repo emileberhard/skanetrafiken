@@ -2,23 +2,24 @@ import random
 import time
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
-from typing import Literal
+from http.client import HTTPException
+from importlib.metadata import version
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
-from pydantic import AwareDatetime, BaseModel, Field, ValidationError
+from pydantic import AwareDatetime, BaseModel, Field, StrictInt, ValidationError
+
+from skane._errors import InvalidResponseError, UnavailableError, UsageError
 
 BASE = "https://www.skanetrafiken.se/gw-tps/api"
-
-
-from skane._errors import InvalidResponseError, UnavailableError
+VERSION = version("skane")
 
 
 class Point(BaseModel):
     id2: str
     name: str
-    type: Literal["STOP_AREA", "ADDRESS", "POI"]
+    type: str
     area: str | None = None
     lat: float
     lon: float
@@ -32,7 +33,7 @@ class StopTime(BaseModel):
     name: str
     id2: str | None = None
     time: AwareDatetime
-    deviation: int | None = None
+    deviation: StrictInt | None = None
     pos: str | None = None
     scheduledPos: str | None = None
 
@@ -46,9 +47,7 @@ class Line(BaseModel):
     type: str
     no: str | None = None
     towards: str | None = None
-    color: str | None = None
-    iconColor: str | None = None
-    distance: str | float | None = None
+    distance: str | None = None
 
 
 class Link(BaseModel):
@@ -58,7 +57,6 @@ class Link(BaseModel):
     line: Line
     canceled: bool = False
     deviations: list[Notice] = []
-    distance: str | float | None = None
 
 
 class Journey(BaseModel):
@@ -75,7 +73,9 @@ class Journeys(BaseModel):
 
 class Timing(BaseModel):
     time: AwareDatetime
-    deviation: int | None = None
+    deviation: StrictInt | None = None
+    canceled: bool = False
+    timeOmitted: bool = False
 
 
 class TripStop(BaseModel):
@@ -89,10 +89,33 @@ class TripStop(BaseModel):
 
 class TripStops(BaseModel):
     stops: list[TripStop]
-    refreshRateSeconds: int | None = None
 
 
-def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version: str) -> T:
+class ErrorDetail(BaseModel):
+    Code: str
+    Source: str
+    Message: str
+    Details: str | None = None
+
+
+class ErrorEnvelope(BaseModel):
+    Error: ErrorDetail
+
+
+def _error_detail(data: bytes) -> ErrorDetail | None:
+    try:
+        return ErrorEnvelope.model_validate_json(data).Error
+    except ValidationError:
+        return None
+
+
+def _message(path: str, status: int, detail: ErrorDetail | None) -> str:
+    if detail is None:
+        return f"Skånetrafiken {path} returned HTTP {status}; Message: unavailable; Details: unavailable."
+    return f"Skånetrafiken {path} returned HTTP {status} ({detail.Code}): Message: {detail.Message}; Details: {detail.Details or 'none'}."
+
+
+def get[T: BaseModel](path: str, params: dict[str, str], model: type[T]) -> T:
     url = BASE + path
     if params:
         url += "?" + urlencode(params)
@@ -101,7 +124,7 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
         headers={
             "Search-Engine-Environment": "TjP",
             "Accept-Language": "sv-SE",
-            "User-Agent": f"skane/{version}",
+            "User-Agent": f"skane/{VERSION}",
         },
     )
     for attempt in range(3):
@@ -109,19 +132,46 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
         try:
             with urlopen(request, timeout=12) as response:
                 data = response.read()
+            detail = _error_detail(data)
+            if detail is not None:
+                message = _message(path, 200, detail)
+                if detail.Source == "Client":
+                    raise UsageError(message)
+                raise UnavailableError(message)
             try:
                 return model.model_validate_json(data)
             except (ValidationError, ValueError) as exc:
                 raise InvalidResponseError(
-                    f"Skånetrafiken response for {path} is invalid; the API may have changed and skane needs repair: {str(exc)[:600]}",
+                    f"Skånetrafiken response for {path} is invalid; the API may have changed and skane needs repair: {str(exc)[:600]}"
                 ) from exc
         except HTTPError as exc:
-            if exc.code < 500 and exc.code != 429:
-                raise UnavailableError(
-                    f"Skånetrafiken {path} returned HTTP {exc.code}; check the request or try later.",
+            try:
+                detail = _error_detail(exc.read())
+            except (HTTPException, OSError) as read_error:
+                error = str(read_error)
+                if attempt < 2:
+                    time.sleep(random.uniform(0.2, 0.5) * 2**attempt)
+                continue
+            message = _message(path, exc.code, detail)
+            if exc.code in (404, 410) and path in ("/v2/Points", "/v2/Journey"):
+                raise InvalidResponseError(
+                    f"{message} The API endpoint may have changed; skane needs repair."
                 ) from exc
-            error = exc
-            header = exc.headers.get("Retry-After")
+            if detail and (
+                detail.Source == "Client"
+                or (
+                    path.startswith("/v3/RouteLink/")
+                    and detail.Code == "TPS5001"
+                    and detail.Details
+                    and "400" in detail.Details
+                    and "Invalid pattern of serviceJourneyId" in detail.Details
+                )
+            ):
+                raise UsageError(message) from exc
+            if exc.code < 500 and exc.code != 429:
+                raise UnavailableError(f"{message} Try again later.") from exc
+            error = message
+            header = exc.headers.get("Retry-After") if exc.headers else None
             if header:
                 try:
                     retry_after = max(0.0, float(header))
@@ -133,25 +183,23 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], version
                     except (TypeError, ValueError, OverflowError):
                         retry_after = 0.0
                 if retry_after > 10:
-                    raise UnavailableError(
-                        f"Skånetrafiken {path} asks to retry after {header}; try again later."
-                    ) from exc
-        except (URLError, TimeoutError, OSError) as exc:
-            error = exc
+                    raise UnavailableError(f"{message} Retry after {header}.") from exc
+        except (URLError, OSError, HTTPException) as exc:
+            error = str(exc)
         if attempt < 2:
             time.sleep(max(retry_after, random.uniform(0.2, 0.5) * 2**attempt))
     raise UnavailableError(
-        f"Skånetrafiken {path} is unreachable or failing after retries: {error}; try again later.",
+        f"Skånetrafiken {path} is unreachable or failing after retries: {error}; try again later."
     )
 
 
-def points(query: str, version: str) -> list[Point]:
-    return get("/v2/Points", {"name": query}, Points, version).points
+def points(query: str) -> list[Point]:
+    return get("/v2/Points", {"name": query}, Points).points
 
 
-def journey(params: dict[str, str], version: str) -> Journeys:
-    return get("/v2/Journey", params, Journeys, version)
+def journey(params: dict[str, str]) -> Journeys:
+    return get("/v2/Journey", params, Journeys)
 
 
-def trip(leg_id: str, version: str) -> TripStops:
-    return get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, version)
+def leg_stops(leg_id: str) -> TripStops:
+    return get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops)

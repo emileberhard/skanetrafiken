@@ -1,0 +1,10 @@
+{
+  "Api": "se.skanetrafiken.api",
+  "Error": {
+    "Code": "TPS5001",
+    "Source": "TjP",
+    "Message": "Internal search engine error.",
+    "Details": "400 {\"errorCode\":\"RP4000\",\"message\":\"Invalid pattern of serviceJourneyId\"}",
+    "Parameters": null
+  }
+}

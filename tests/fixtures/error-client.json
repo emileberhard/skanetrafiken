@@ -1,0 +1,10 @@
+{
+  "Api": "se.skanetrafiken.api",
+  "Error": {
+    "Code": "TPS4002",
+    "Source": "Client",
+    "Message": "Departure point could not be found.",
+    "Details": null,
+    "Parameters": null
+  }
+}

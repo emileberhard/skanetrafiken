@@ -1,30 +1,43 @@
-from skane._client import Client
-from skane._errors import InvalidResponseError, SkaneError, UnavailableError, UsageError
+from skane._client import leg_stops, stops, trips
+from skane._errors import (
+    AmbiguousPlaceError,
+    InvalidResponseError,
+    SkaneError,
+    UnavailableError,
+    UsageError,
+)
 from skane._models import (
-    Journey,
+    ArriveBy,
+    DepartAt,
     Leg,
     Place,
     PlaceRef,
     StopTime,
     Timing,
+    Trip,
     Trips,
     VehicleStop,
     VehicleTrip,
 )
 
 __all__ = [
-    "Client",
+    "AmbiguousPlaceError",
+    "ArriveBy",
+    "DepartAt",
     "InvalidResponseError",
-    "Journey",
     "Leg",
     "Place",
     "PlaceRef",
     "SkaneError",
     "StopTime",
     "Timing",
+    "Trip",
     "Trips",
     "UnavailableError",
     "UsageError",
     "VehicleStop",
     "VehicleTrip",
+    "leg_stops",
+    "stops",
+    "trips",
 ]
