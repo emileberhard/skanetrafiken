@@ -170,7 +170,8 @@ def _remaining(deadline: float) -> float:
     remaining = deadline - time.monotonic()
     if remaining <= 0:
         raise UnavailableError(
-            f"Skånetrafiken request exceeded the {DEADLINE_SECONDS}-second deadline; try again later."
+            f"Skånetrafiken request exceeded the {DEADLINE_SECONDS}-second deadline; "
+            "try again later."
         )
     return remaining
 
@@ -286,7 +287,9 @@ def _get[T: BaseModel](
 
 def _moved_endpoint(status: int, detail: ErrorDetail | None, message: str) -> SkaneError | None:
     if status in (404, 410):
-        return InvalidResponseError(f"{message} The API endpoint may have changed; skane needs repair.")
+        return InvalidResponseError(
+            f"{message} The API endpoint may have changed; skane needs repair."
+        )
     return None
 
 
@@ -309,4 +312,6 @@ def journey(params: dict[str, str], deadline: float) -> Journeys:
 
 
 def vehicle_trip(leg_id: str, deadline: float) -> TripStops:
-    return _get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline, _malformed_leg_id)
+    return _get(
+        "/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline, _malformed_leg_id
+    )

@@ -182,9 +182,8 @@ def _trips(result: Trips) -> None:
 def _leg(result: VehicleTrip) -> None:
     for stop in result.stops:
         cancelled = " " + _status("CANCELLED") if stop.cancelled else ""
-        print(
-            f"{_clock(stop.arrival)} / {_clock(stop.departure)}  {stop.name}  {stop.platform or ''}{cancelled}"
-        )
+        times = f"{_clock(stop.arrival)} / {_clock(stop.departure)}"
+        print(f"{times}  {stop.name}  {stop.platform or ''}{cancelled}")
 
 
 def _report_error(error: SkaneError, as_json: bool) -> Never:

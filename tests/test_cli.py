@@ -113,7 +113,8 @@ def test_bus_json_contract_and_filter(monkeypatch, capsys):
     assert trip["departure"] == "2026-11-02T06:09:00+01:00"
     assert trip["arrival"] == "2026-11-02T06:26:00+01:00"
     assert (leg["mode"], leg["line"], leg["towards"]) == ("bus", "171", "Malmö Södervärn")
-    assert leg["from"]["expected"] is None and leg["from"]["delayMinutes"] is None
+    assert leg["from"]["expected"] is None
+    assert leg["from"]["delayMinutes"] is None
 
 
 def test_leg_realtime_and_omitted_time(monkeypatch, capsys):
@@ -401,11 +402,9 @@ def test_error_envelopes_and_fixed_endpoint_404(monkeypatch, capsys):
             cli.main()
         error = json.loads(capsys.readouterr().out)["error"]
         assert error["kind"] == "usage"
-        assert (
-            message in error["message"]
-            and "Message:" in error["message"]
-            and "Details:" in error["message"]
-        )
+        assert message in error["message"]
+        assert "Message:" in error["message"]
+        assert "Details:" in error["message"]
         assert len(calls) == 1
 
     def missing(request, timeout):
@@ -526,7 +525,9 @@ def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
         monkeypatch, capsys, "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1", "--json"
     )
     stop = result["trips"][0]["legs"][0]["from"]
-    assert stop["timeOmitted"] is True and stop["expected"] is None and stop["delayMinutes"] is None
+    assert stop["timeOmitted"] is True
+    assert stop["expected"] is None
+    assert stop["delayMinutes"] is None
     monkeypatch.setattr(
         sys, "argv", ["skane", "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1"]
     )
@@ -565,7 +566,8 @@ def test_retry_after_paces_the_next_attempt(monkeypatch, capsys):
     monkeypatch.setattr(_wire, "urlopen", throttled_once)
     monkeypatch.setattr(_wire.time, "sleep", sleeps.append)
     result = invoke(monkeypatch, capsys, "stops", "Jupitergatan", "--json")
-    assert len(calls) == 2 and sleeps == [2.0]
+    assert len(calls) == 2
+    assert sleeps == [2.0]
     assert any(place["id"] == "9021012081116000" for place in result["places"])
 
 
@@ -602,7 +604,8 @@ def test_non_json_success_is_unavailable_not_a_changed_api(monkeypatch, capsys):
         _wire, "urlopen", lambda request, timeout: ok(b"<html>", request.full_url, "text/html")
     )
     code, error = fail(monkeypatch, capsys, "stops", "Lund")
-    assert code == 3 and "text/html instead of JSON" in error["message"]
+    assert code == 3
+    assert "text/html instead of JSON" in error["message"]
 
 
 def test_stalled_request_is_abandoned_at_the_deadline(monkeypatch, capsys):
