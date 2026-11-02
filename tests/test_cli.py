@@ -92,14 +92,12 @@ def test_bus_json_contract_and_filter(monkeypatch, capsys):
     assert leg["from"]["expected"] is None and leg["from"]["delayMinutes"] is None
 
 
-def test_leg_realtime_and_stop_flags(monkeypatch, capsys):
+def test_leg_realtime_and_omitted_time(monkeypatch, capsys):
     raw = fixture("route-realtime.json")
-    raw["stops"][0]["departure"].update(canceled=True, timeOmitted=True)
-    raw["stops"][1]["arrival"]["canceled"] = True
+    raw["stops"][0]["departure"]["timeOmitted"] = True
     respond(monkeypatch, raw)
     result = invoke(monkeypatch, capsys, "leg", "leg-id", "--json")
     first, second = result["stops"][:2]
-    assert first["cancelled"] is True and second["cancelled"] is True
     assert first["departure"] == {
         "scheduled": "2026-11-02T02:21:00+01:00",
         "expected": None,
@@ -110,8 +108,32 @@ def test_leg_realtime_and_stop_flags(monkeypatch, capsys):
     assert second["arrival"]["delayMinutes"] == -1
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id"])
     cli.main()
-    rendered = capsys.readouterr().out
-    assert "CANCELLED" in rendered and "--:-- (scheduled 02:21)" in rendered
+    assert "--:-- (scheduled 02:21)" in capsys.readouterr().out
+
+
+def test_recorded_cancellations_mark_only_the_cancelled_section(monkeypatch, capsys):
+    respond(monkeypatch, fixture("journey-cancelled.json"))
+    result = invoke(
+        monkeypatch,
+        capsys,
+        "trips",
+        "9021012086239000",
+        "9021012091069000",
+        "--at",
+        "2026-11-02 05:00",
+        "--json",
+    )
+    assert [trip["legs"][0]["cancelled"] for trip in result["trips"]] == [False, True]
+    respond(monkeypatch, fixture("route-cancelled.json"))
+    stops = {stop["name"]: stop for stop in invoke(monkeypatch, capsys, "leg", "1753", "--json")["stops"]}
+    assert stops["Ystad station"]["cancelled"] is False
+    assert stops["Köpingebro station"]["cancelled"] is True
+    assert stops["Köpingebro station"]["arrival"]["delayMinutes"] is None
+    assert stops["Simrishamn station"]["cancelled"] is True
+    monkeypatch.setattr(sys, "argv", ["skane", "leg", "1753"])
+    cli.main()
+    rendered = capsys.readouterr().out.splitlines()
+    assert [line.endswith("CANCELLED") for line in rendered].count(True) == 4
 
 
 def test_on_time_and_timetable_are_distinct_in_human_output(monkeypatch, capsys):
