@@ -68,7 +68,8 @@ def _resolve(query: str | Place) -> _Place:
 
 
 def _stop_time(stop: _wire.StopTime) -> StopTime:
-    expected = stop.time + timedelta(minutes=stop.deviation) if stop.deviation is not None else None
+    deviation = None if stop.timeOmitted else stop.deviation
+    expected = stop.time + timedelta(minutes=deviation) if deviation is not None else None
     return StopTime(
         stop.id2,
         stop.name,
@@ -76,7 +77,8 @@ def _stop_time(stop: _wire.StopTime) -> StopTime:
         stop.scheduledPos,
         stop.time.astimezone(ZONE),
         expected.astimezone(ZONE) if expected else None,
-        stop.deviation,
+        deviation,
+        stop.timeOmitted,
     )
 
 

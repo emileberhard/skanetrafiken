@@ -57,6 +57,7 @@ class StopTime(_Serializable):
     scheduled: datetime
     expected: datetime | None
     delay_minutes: int | None
+    time_omitted: bool
 
 
 @dataclass(frozen=True, slots=True)
