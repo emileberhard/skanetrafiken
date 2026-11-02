@@ -179,12 +179,10 @@ def plan(args: argparse.Namespace) -> dict:
         "allowWalkToOtherStop": "true",
     }
     when = args.arrive_by or args.at
+    boundary = local_time(when).astimezone(UTC) if when else datetime.now(UTC)
     if when:
-        params["journeyDateTime"] = (
-            local_time(when)
-            .astimezone(UTC)
-            .isoformat(timespec="milliseconds")
-            .replace("+00:00", "Z")
+        params["journeyDateTime"] = boundary.isoformat(timespec="milliseconds").replace(
+            "+00:00", "Z"
         )
     found: list[dict[str, Any]] = []
     seen: set[tuple] = set()
@@ -197,6 +195,13 @@ def plan(args: argparse.Namespace) -> dict:
             if args.line and (not transit or any(link.line.no != args.line for link in transit)):
                 continue
             legs = [leg(link) for link in links]
+            departure = legs[0]["from"]["expected"] or legs[0]["from"]["scheduled"]
+            arrival = legs[-1]["to"]["expected"] or legs[-1]["to"]["scheduled"]
+            if args.arrive_by:
+                if datetime.fromisoformat(arrival).astimezone(UTC) > boundary:
+                    continue
+            elif datetime.fromisoformat(departure).astimezone(UTC) < boundary:
+                continue
             key = tuple((link.id, link.origin.time) for link in links)
             if key in seen:
                 continue
@@ -204,8 +209,8 @@ def plan(args: argparse.Namespace) -> dict:
             notices = [j.deviationTag.text] if j.deviationTag else []
             found.append(
                 {
-                    "departure": legs[0]["from"]["expected"] or legs[0]["from"]["scheduled"],
-                    "arrival": legs[-1]["to"]["expected"] or legs[-1]["to"]["scheduled"],
+                    "departure": departure,
+                    "arrival": arrival,
                     "changes": j.noOfChanges,
                     "notices": notices,
                     "legs": legs,
