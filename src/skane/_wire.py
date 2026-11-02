@@ -305,5 +305,5 @@ def journey(params: dict[str, str], deadline: float) -> Journeys:
     return _get("/v2/Journey", params, Journeys, deadline, _moved_endpoint)
 
 
-def leg_stops(leg_id: str, deadline: float) -> TripStops:
+def vehicle_trip(leg_id: str, deadline: float) -> TripStops:
     return _get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline, _malformed_leg_id)
