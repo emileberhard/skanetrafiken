@@ -1,7 +1,10 @@
 import json
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any
+
+from skane._errors import UsageError
+
+type JSONValue = None | bool | int | float | str | list[JSONValue] | dict[str, JSONValue]
 
 JSON_NAMES = {
     "origin": "from",
@@ -13,20 +16,22 @@ JSON_NAMES = {
 }
 
 
-def _json_value(value: Any) -> Any:
+def _json_value(value: object) -> JSONValue:
     if isinstance(value, datetime):
         return value.isoformat()
     if isinstance(value, (list, tuple)):
         return [_json_value(item) for item in value]
     if isinstance(value, dict):
         return {JSON_NAMES.get(key, key): _json_value(item) for key, item in value.items()}
-    return value
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    raise TypeError(f"Cannot serialize {type(value).__name__} as JSON")
 
 
 @dataclass(frozen=True, slots=True)
 class _Serializable:
-    def to_dict(self) -> dict[str, Any]:
-        return _json_value(asdict(self))
+    def to_dict(self) -> dict[str, JSONValue]:
+        return {JSON_NAMES.get(key, key): _json_value(value) for key, value in asdict(self).items()}
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), ensure_ascii=False)
@@ -118,7 +123,18 @@ class VehicleTrip(_Serializable):
 class DepartAt:
     time: datetime
 
+    def __post_init__(self) -> None:
+        _require_aware(self.time)
+
 
 @dataclass(frozen=True, slots=True)
 class ArriveBy:
     time: datetime
+
+    def __post_init__(self) -> None:
+        _require_aware(self.time)
+
+
+def _require_aware(value: datetime) -> None:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise UsageError("Journey time must include a timezone.")

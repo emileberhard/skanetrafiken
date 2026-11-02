@@ -2,9 +2,8 @@ import argparse
 import json
 import os
 import re
-import subprocess
 import sys
-from datetime import UTC, datetime, time, timedelta
+from datetime import datetime, time
 from typing import Never
 from zoneinfo import ZoneInfo
 
@@ -18,7 +17,6 @@ from skane import (
     StopTime,
     Timing,
     Trips,
-    UnavailableError,
     UsageError,
     VehicleTrip,
     leg_stops,
@@ -37,6 +35,7 @@ class Parser(argparse.ArgumentParser):
 
 def parser() -> Parser:
     p = Parser(
+        prog="skane",
         description="Plan Skåne public transport journeys.",
         epilog="Exit codes: 0 success, 2 usage or ambiguous place, 3 API unavailable or deadline exceeded, 4 upstream response changed. Example: skane trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json",
     )
@@ -55,12 +54,12 @@ def parser() -> Parser:
     journey.add_argument("destination", metavar="TO")
     times = journey.add_mutually_exclusive_group()
     times.add_argument(
-        "--at", metavar="TIME", help="Departure in Stockholm time; HH:MM means its next occurrence"
+        "--at", metavar="TIME", help="Departure in Stockholm time; HH:MM means today, even if past"
     )
     times.add_argument(
         "--arrive-by",
         metavar="TIME",
-        help="Arrival in Stockholm time; HH:MM means its next occurrence",
+        help="Arrival in Stockholm time; HH:MM means today, even if past",
     )
     journey.add_argument(
         "--line", help="Keep trips whose transit legs all match this line; trains use run numbers"
@@ -81,31 +80,16 @@ def parser() -> Parser:
     return p
 
 
-def _next_occurrence(value: time, now: datetime) -> datetime:
-    current = now.astimezone(UTC)
-    day = now.astimezone(ZONE).date()
-    for offset in range(3):
-        wall = datetime.combine(day + timedelta(days=offset), value)
-        choices = []
-        for fold in (0, 1):
-            candidate = wall.replace(tzinfo=ZONE, fold=fold)
-            instant = candidate.astimezone(UTC)
-            if instant.astimezone(ZONE).replace(tzinfo=None) == wall and instant >= current:
-                choices.append(instant)
-        if choices:
-            return min(choices).astimezone(ZONE)
-    raise UsageError("No valid occurrence of the requested time.")
-
-
 def local_time(value: str) -> datetime:
     try:
         if re.fullmatch(r"\d{2}:\d{2}", value):
-            return _next_occurrence(time.fromisoformat(value), datetime.now(ZONE))
-        if not re.fullmatch(
+            parsed = datetime.combine(datetime.now(ZONE).date(), time.fromisoformat(value))
+        elif not re.fullmatch(
             r"\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?", value
         ):
             raise ValueError("unsupported format")
-        parsed = datetime.fromisoformat(value)
+        else:
+            parsed = datetime.fromisoformat(value)
         if parsed.tzinfo is not None:
             return parsed.astimezone(ZONE)
         a = parsed.replace(tzinfo=ZONE, fold=0)
@@ -192,7 +176,7 @@ def _report_error(error: SkaneError, as_json: bool) -> Never:
     sys.exit(code)
 
 
-def _run() -> None:
+def main() -> None:
     wants_json = "--json" in sys.argv[1:]
     try:
         args = parser().parse_args()
@@ -210,30 +194,13 @@ def _run() -> None:
                 if args.arrive_by
                 else None
             )
-            result = trips(args.origin, args.destination, when, args.line, args.count)
+            result = trips(args.origin, args.destination, when, line=args.line, count=args.count)
             print(result.to_json()) if args.json else _trips(result)
         else:
             result = leg_stops(args.leg_id)
             print(result.to_json()) if args.json else _leg(result)
     except SkaneError as exc:
         _report_error(exc, wants_json)
-
-
-def main() -> None:
-    try:
-        result = subprocess.run(
-            [sys.executable, "-c", "from skane.cli import _run; _run()", *sys.argv[1:]],
-            timeout=29,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        _report_error(
-            UnavailableError(
-                "Skånetrafiken request exceeded the 30-second command deadline; try again later."
-            ),
-            "--json" in sys.argv[1:],
-        )
-    sys.exit(result.returncode)
 
 
 if __name__ == "__main__":

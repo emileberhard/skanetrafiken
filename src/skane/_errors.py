@@ -1,4 +1,9 @@
-from skane._models import Place
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from skane._models import Place
 
 
 class SkaneError(Exception):

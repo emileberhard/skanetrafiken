@@ -14,6 +14,7 @@ from skane._errors import InvalidResponseError, UnavailableError, UsageError
 
 BASE = "https://www.skanetrafiken.se/gw-tps/api"
 VERSION = version("skane")
+DEADLINE_SECONDS = 30
 
 
 class Point(BaseModel):
@@ -116,7 +117,16 @@ def _message(path: str, status: int, detail: ErrorDetail | None) -> str:
     return f"Skånetrafiken {path} returned HTTP {status} ({detail.Code}): Message: {detail.Message}; Details: {detail.Details or 'none'}."
 
 
-def get[T: BaseModel](path: str, params: dict[str, str], model: type[T]) -> T:
+def _remaining(deadline: float) -> float:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise UnavailableError(
+            f"Skånetrafiken request exceeded the {DEADLINE_SECONDS}-second deadline; try again later."
+        )
+    return remaining
+
+
+def get[T: BaseModel](path: str, params: dict[str, str], model: type[T], deadline: float) -> T:
     url = BASE + path
     if params:
         url += "?" + urlencode(params)
@@ -131,8 +141,9 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T]) -> T:
     for attempt in range(3):
         retry_after = 0.0
         try:
-            with urlopen(request, timeout=12) as response:
+            with urlopen(request, timeout=min(12, _remaining(deadline))) as response:
                 data = response.read()
+            _remaining(deadline)
             detail = _error_detail(data)
             if detail is not None:
                 message = _message(path, 200, detail)
@@ -148,10 +159,11 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T]) -> T:
         except HTTPError as exc:
             try:
                 detail = _error_detail(exc.read())
+                _remaining(deadline)
             except (HTTPException, OSError) as read_error:
                 error = str(read_error)
                 if attempt < 2:
-                    time.sleep(random.uniform(0.2, 0.5) * 2**attempt)
+                    time.sleep(min(random.uniform(0.2, 0.5) * 2**attempt, _remaining(deadline)))
                 continue
             message = _message(path, exc.code, detail)
             if exc.code in (404, 410) and path in ("/v2/Points", "/v2/Journey"):
@@ -188,19 +200,22 @@ def get[T: BaseModel](path: str, params: dict[str, str], model: type[T]) -> T:
         except (URLError, OSError, HTTPException) as exc:
             error = str(exc)
         if attempt < 2:
-            time.sleep(max(retry_after, random.uniform(0.2, 0.5) * 2**attempt))
+            time.sleep(
+                min(max(retry_after, random.uniform(0.2, 0.5) * 2**attempt), _remaining(deadline))
+            )
+    _remaining(deadline)
     raise UnavailableError(
         f"Skånetrafiken {path} is unreachable or failing after retries: {error}; try again later."
     )
 
 
-def points(query: str) -> list[Point]:
-    return get("/v2/Points", {"name": query}, Points).points
+def points(query: str, deadline: float) -> list[Point]:
+    return get("/v2/Points", {"name": query}, Points, deadline).points
 
 
-def journey(params: dict[str, str]) -> Journeys:
-    return get("/v2/Journey", params, Journeys)
+def journey(params: dict[str, str], deadline: float) -> Journeys:
+    return get("/v2/Journey", params, Journeys, deadline)
 
 
-def leg_stops(leg_id: str) -> TripStops:
-    return get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops)
+def leg_stops(leg_id: str, deadline: float) -> TripStops:
+    return get("/v3/RouteLink/" + quote(leg_id, safe=""), {}, TripStops, deadline)
