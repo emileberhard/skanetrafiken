@@ -7,16 +7,24 @@ uv add skane
 uv tool install skane
 skane stops Jupitergatan
 skane trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json
+skane leg 'LEG_ID'
 ```
 
 ```python
-from skane import Client
+from skane import DepartAt, trips
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-result = Client().trips("Lund Jupitergatan", "Malmö Kungsgatan", line="171")
-for journey in result.trips:
-    print(journey.departure, journey.arrival)
+result = trips(
+    "Lund Jupitergatan",
+    "Malmö Kungsgatan",
+    DepartAt(datetime(2026, 11, 3, 7, 0, tzinfo=ZoneInfo("Europe/Stockholm"))),
+    line="171",
+)
+for trip in result.trips:
+    print(trip.departure, trip.arrival)
 ```
 
-The immutable models expose `to_dict()` and `to_json()` with the same fields as the CLI JSON. Times are aware `datetime` values in Europe/Stockholm; input datetimes must be timezone-aware. Missing realtime values are `None`, not zero. Place names must match exactly, ignoring case; use `Client().stops()` to find IDs or coordinates. Failures derive from `SkaneError`: `UsageError`, `UnavailableError` and `InvalidResponseError`.
+Immutable models expose `to_dict()` and `to_json()` with the same fields as CLI JSON. Times are aware `datetime` values in Europe/Stockholm; input datetimes must be timezone-aware. Missing realtime values are `None`, not zero. Names must match exactly, ignoring case; `stops()` returns reusable `Place` values. Failures derive from `SkaneError`: `UsageError`, `UnavailableError` and `InvalidResponseError`. Ambiguous matches raise `AmbiguousPlaceError` with candidates.
 
 Use `skane --help` and each command's `--help` for options and exit codes. Development: `uv sync --locked`, then `just check`.
