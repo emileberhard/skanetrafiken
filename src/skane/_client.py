@@ -3,12 +3,11 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal, InvalidOperation
 from typing import Literal
 from zoneinfo import ZoneInfo
 
 from skane import _wire
-from skane._errors import AmbiguousPlaceError, InvalidResponseError, UsageError
+from skane._errors import AmbiguousPlaceError, UsageError
 from skane._models import (
     ArriveBy,
     DepartAt,
@@ -109,22 +108,6 @@ def _stop_time(stop: _wire.StopTime) -> StopTime:
     )
 
 
-def _distance_meters(value: str | None) -> int | None:
-    if value is None:
-        return None
-    match = re.fullmatch(r"\s*(\d+(?:[.,]\d+)?)\s*(m|km)\s*", value, re.IGNORECASE)
-    if match:
-        try:
-            distance = Decimal(match.group(1).replace(",", ".")) * (
-                1000 if match.group(2).lower() == "km" else 1
-            )
-            if distance == distance.to_integral_value():
-                return int(distance)
-        except InvalidOperation:
-            pass
-    raise InvalidResponseError(f"Invalid upstream walk distance {value!r}; skane needs repair.")
-
-
 def _leg(link: _wire.Link) -> Leg:
     line = link.line
     mode = "train" if line.type.lower().startswith("train") else line.type.lower()
@@ -138,7 +121,7 @@ def _leg(link: _wire.Link) -> Leg:
         notices=tuple(n.text for n in link.deviations),
         origin=_stop_time(link.origin),
         destination=_stop_time(link.destination),
-        distance_meters=_distance_meters(line.distance) if mode == "walk" else None,
+        distance_meters=line.distance,
     )
 
 

@@ -195,9 +195,19 @@ def test_returned_places_are_reusable(monkeypatch, capsys):
     assert again.origin == skane.PlaceRef(chosen.id, None)
 
 
-def test_invalid_upstream_response_and_boolean_delay_exit_4(monkeypatch, capsys):
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("from", {"name": "Lund", "time": "2026-11-02T05:09:00Z", "deviation": False}),
+     ("line", {"name": "Gång", "type": "Walk", "distance": "about a kilometre"}),
+     ("deviations", None)],
+)
+def test_invalid_upstream_leg_exits_4(monkeypatch, capsys, field, value):
     raw = fixture("journey-bus.json")
-    raw["journeys"][0]["routeLinks"][0]["from"]["deviation"] = False
+    link = raw["journeys"][0]["routeLinks"][0]
+    if value is None:
+        del link[field]
+    else:
+        link[field] = value
     respond(monkeypatch, raw)
     monkeypatch.setattr(
         sys, "argv", ["skane", "trips", "123", "456", "--at", "2026-11-02 00:00", "--json"]
@@ -299,14 +309,17 @@ def test_walk_distance_and_train_mode(monkeypatch, capsys):
     walk, train = result["trips"][0]["legs"]
     assert (walk["mode"], walk["distanceMeters"], walk["line"]) == ("walk", 903, None)
     assert train["mode"] == "train"
-    del raw["journeys"][0]["routeLinks"][0]["line"]["distance"]
+    walk_line = raw["journeys"][0]["routeLinks"][0]["line"]
+    walk_line["distance"] = "1,2 km"
+    result = invoke(
+        monkeypatch, capsys, "trips", "1", "2", "--at", "2026-11-02 03:00", "--count", "1", "--json"
+    )
+    assert result["trips"][0]["legs"][0]["distanceMeters"] == 1200
+    del walk_line["distance"]
     result = invoke(
         monkeypatch, capsys, "trips", "1", "2", "--at", "2026-11-02 03:00", "--count", "1", "--json"
     )
     assert result["trips"][0]["legs"][0]["distanceMeters"] is None
-    assert skane._client._distance_meters("1,2 km") == 1200
-    with pytest.raises(skane.InvalidResponseError):
-        skane._client._distance_meters("unknown")
 
 
 def test_journey_preserves_live_delay_without_inventing_departure(monkeypatch, capsys):

@@ -1,20 +1,37 @@
 import random
+import re
 import time
 from datetime import UTC, datetime
+from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
 from importlib.metadata import version
+from typing import Annotated
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
-from pydantic import AwareDatetime, BaseModel, Field, StrictInt, ValidationError
+from pydantic import AwareDatetime, BaseModel, BeforeValidator, Field, StrictInt, ValidationError
 
 from skane._errors import InvalidResponseError, UnavailableError, UsageError
 
 BASE = "https://www.skanetrafiken.se/gw-tps/api"
 VERSION = version("skane")
 DEADLINE_SECONDS = 30
+
+
+def _meters(value: object) -> object:
+    if not isinstance(value, str):
+        return value
+    match = re.fullmatch(r"\s*(\d+(?:[.,]\d+)?)\s*(m|km)\s*", value, re.IGNORECASE)
+    if match is None:
+        raise ValueError("expected a distance such as '903 m' or '1,2 km'")
+    meters = Decimal(match.group(1).replace(",", "."))
+    if match.group(2).lower() == "km":
+        meters *= 1000
+    if meters != meters.to_integral_value():
+        raise ValueError("expected a whole number of meters")
+    return int(meters)
 
 
 class Point(BaseModel):
@@ -49,7 +66,7 @@ class Line(BaseModel):
     type: str
     no: str | None = None
     towards: str | None = None
-    distance: str | None = None
+    distance: Annotated[int, BeforeValidator(_meters)] | None = None
 
 
 class Link(BaseModel):
