@@ -149,7 +149,9 @@ def test_recorded_cancellations_mark_only_the_cancelled_section(monkeypatch, cap
     )
     assert [trip["legs"][0]["cancelled"] for trip in result["trips"]] == [False, True]
     respond(monkeypatch, fixture("route-cancelled.json"))
-    stops = {stop["name"]: stop for stop in invoke(monkeypatch, capsys, "leg", "1753", "--json")["stops"]}
+    stops = {
+        stop["name"]: stop for stop in invoke(monkeypatch, capsys, "leg", "1753", "--json")["stops"]
+    }
     assert stops["Ystad station"]["cancelled"] is False
     assert stops["Köpingebro station"]["cancelled"] is True
     assert stops["Köpingebro station"]["arrival"]["delayMinutes"] is None
@@ -187,7 +189,12 @@ def test_unresolved_place_has_structured_candidates_and_cli_exit_2(monkeypatch, 
     with pytest.raises(SystemExit, match="2"):
         cli.main()
     error = json.loads(capsys.readouterr().out)["error"]
-    assert error["code"] == 2 and "Lund Jupitergatan" in error["message"]
+    assert error["kind"] == "unresolved_place"
+    assert {
+        "id": "9021012081116000",
+        "name": "Lund Jupitergatan",
+        "type": "STOP_AREA",
+    }.items() <= next(c for c in error["candidates"] if c["id"] == "9021012081116000").items()
 
 
 def test_returned_places_are_reusable(monkeypatch, capsys):
@@ -221,9 +228,11 @@ def test_returned_places_are_reusable(monkeypatch, capsys):
 
 @pytest.mark.parametrize(
     ("field", "value"),
-    [("from", {"name": "Lund", "time": "2026-11-02T05:09:00Z", "deviation": False}),
-     ("line", {"name": "Gång", "type": "Walk", "distance": "about a kilometre"}),
-     ("deviations", None)],
+    [
+        ("from", {"name": "Lund", "time": "2026-11-02T05:09:00Z", "deviation": False}),
+        ("line", {"name": "Gång", "type": "Walk", "distance": "about a kilometre"}),
+        ("deviations", None),
+    ],
 )
 def test_invalid_upstream_leg_exits_4(monkeypatch, capsys, field, value):
     raw = fixture("journey-bus.json")
@@ -238,7 +247,7 @@ def test_invalid_upstream_leg_exits_4(monkeypatch, capsys, field, value):
     )
     with pytest.raises(SystemExit, match="4"):
         cli.main()
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
+    assert json.loads(capsys.readouterr().out)["error"]["kind"] == "invalid_response"
 
 
 def test_line_filter_pages_and_deduplicates(monkeypatch, capsys):
@@ -396,6 +405,7 @@ def test_error_envelopes_and_fixed_endpoint_404(monkeypatch, capsys):
         with pytest.raises(SystemExit, match="2"):
             cli.main()
         error = json.loads(capsys.readouterr().out)["error"]
+        assert error["kind"] == "usage"
         assert (
             message in error["message"]
             and "Message:" in error["message"]
@@ -410,7 +420,7 @@ def test_error_envelopes_and_fixed_endpoint_404(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["skane", "stops", "Lund", "--json"])
     with pytest.raises(SystemExit, match="4"):
         cli.main()
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
+    assert json.loads(capsys.readouterr().out)["error"]["kind"] == "invalid_response"
 
 
 def test_incomplete_read_retries_then_json_exit_3(monkeypatch, capsys):
@@ -426,7 +436,7 @@ def test_incomplete_read_retries_then_json_exit_3(monkeypatch, capsys):
     with pytest.raises(SystemExit, match="3"):
         cli.main()
     assert len(calls) == 3
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
+    assert json.loads(capsys.readouterr().out)["error"]["kind"] == "unavailable"
 
 
 def test_deadline_covers_pagination_and_retry(monkeypatch, capsys):
@@ -456,7 +466,7 @@ def test_deadline_covers_pagination_and_retry(monkeypatch, capsys):
         cli.main()
     assert timeouts == [12, 12, 10]
     assert clock[0] == 30
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
+    assert json.loads(capsys.readouterr().out)["error"]["kind"] == "unavailable"
 
 
 def test_past_explicit_departure_and_aware_input(monkeypatch):
@@ -510,7 +520,7 @@ def test_leg_boolean_delay_is_invalid(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id", "--json"])
     with pytest.raises(SystemExit, match="4"):
         cli.main()
-    assert json.loads(capsys.readouterr().out)["error"]["code"] == 4
+    assert json.loads(capsys.readouterr().out)["error"]["kind"] == "invalid_response"
 
 
 def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
@@ -561,7 +571,7 @@ def test_retry_after_paces_the_next_attempt(monkeypatch, capsys):
     monkeypatch.setattr(_wire.time, "sleep", sleeps.append)
     result = invoke(monkeypatch, capsys, "stops", "Jupitergatan", "--json")
     assert len(calls) == 2 and sleeps == [2.0]
-    assert any(place["id"] == "9021012081116000" for place in result)
+    assert any(place["id"] == "9021012081116000" for place in result["places"])
 
 
 @pytest.mark.parametrize("retry_after", ["30", "Fri, 01 Jan 2100 00:00:00 GMT"])
@@ -619,3 +629,11 @@ def test_stalled_request_is_abandoned_at_the_deadline(monkeypatch, capsys):
         released.set()
     assert (code, len(calls)) == (3, 3)
     assert "no complete response" in error["message"]
+
+
+@pytest.mark.parametrize(
+    "args", [["trips", "1", "2", "--count", "many"], ["trips", "1", "2", "--at", "tomorrow"]]
+)
+def test_argument_errors_are_json_usage_errors(monkeypatch, capsys, args):
+    code, error = fail(monkeypatch, capsys, *args)
+    assert (code, error["kind"]) == (2, "usage")
