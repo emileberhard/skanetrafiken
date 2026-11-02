@@ -5,13 +5,13 @@ description: "Find Skåne bus and train journeys, departure and arrival times, d
 
 # Skånetrafiken
 
-Run `skt --version` to check the installed CLI. If missing, download the latest wheel with `ghp release download --repo emileberhard/skanetrafiken --pattern "*.whl"` and install it with `uv tool install ./skanetrafiken_cli-*.whl`. Use `skt --help` and each command's `--help` for the full interface.
+Run `skane --version` to check the CLI; install with `uv tool install skane` or run with `uvx skane`. Use `skane --help` and each command's `--help` for the full interface.
 
 ```sh
-skt stops Jupitergatan
-skt trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json
-skt trips 'Lund C' 'Malmö C' --arrive-by '08:00'
-skt trip 'LEG_ID' --json
+skane stops Jupitergatan
+skane trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json
+skane trips 'Lund C' 'Malmö C' --arrive-by '08:00'
+skane trip 'LEG_ID' --json
 ```
 
-Names must match exactly, ignoring case; otherwise choose an ID or coordinates from `skt stops`. Times are Europe/Stockholm. A null delay means realtime is unavailable, not that the trip is on time. Exit 4 means Skånetrafiken's API response changed and the CLI needs repair.
+Names must match exactly, ignoring case; otherwise choose an ID or coordinates from `skane stops`. Times are Europe/Stockholm. A null delay means the response has no realtime value, not that the trip is on time. Exit 4 means Skånetrafiken's API response changed and the library needs repair.

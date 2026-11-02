@@ -52,8 +52,21 @@ jobs:
           name: distributions
           path: dist/*
           if-no-files-found: error
-  publish:
+  publish-pypi:
     needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: distributions
+          path: dist
+      - run: uv publish
+  publish-github:
+    needs: [build, publish-pypi]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

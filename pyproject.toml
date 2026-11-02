@@ -1,25 +1,24 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.13.4,<0.14"]
+build-backend = "uv_build"
 
 [project]
-name = "skanetrafiken-cli"
+name = "skane"
 version = "0.0.0"
 description = "A command-line journey planner for Skånetrafiken"
-requires-python = ">=3.14,<3.15"
-dependencies = ["pydantic>=2.12,<3"]
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.12,<3", "tzdata>=2025.1; sys_platform == 'win32'"]
 
 [project.scripts]
-skt = "skt.cli:main"
+skane = "skane.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=9", "ruff>=0.14", "ty>=0.0.1"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/skt"]
 
 [tool.ruff]
 line-length = 100
+target-version = "py312"
 
 [tool.uv]
 exclude-newer = "12 hours"
