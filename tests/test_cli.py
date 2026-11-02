@@ -141,3 +141,44 @@ def test_walk_distance_and_train_mode_from_live_response(monkeypatch, capsys):
     assert walk["distance"] == "903 m"
     assert walk["line"] is None
     assert train["mode"] == "train"
+
+
+def test_journey_preserves_live_delay_without_inventing_departure(monkeypatch, capsys):
+    respond(monkeypatch, fixture("journey-realtime.json"))
+    result = invoke(
+        monkeypatch,
+        capsys,
+        "trips",
+        "9021012080000000",
+        "9021012045007000",
+        "--count",
+        "1",
+        "--json",
+    )
+    journey = result["trips"][0]
+    leg = journey["legs"][0]
+    assert leg["mode"] == "train"
+    assert leg["from"]["expected"] is None
+    assert leg["from"]["delayMinutes"] is None
+    assert leg["to"]["scheduled"] == "2026-11-02T03:15:00+01:00"
+    assert leg["to"]["expected"] == "2026-11-02T03:10:00+01:00"
+    assert leg["to"]["delayMinutes"] == -5
+    assert journey["arrival"] == "2026-11-02T03:10:00+01:00"
+
+
+def test_unavailable_api_retries_and_exits_3(monkeypatch, capsys):
+    from urllib.error import URLError
+
+    calls = []
+
+    def unavailable(request, timeout):
+        calls.append(request.full_url)
+        raise URLError("offline")
+
+    monkeypatch.setattr(api, "urlopen", unavailable)
+    monkeypatch.setattr(api.time, "sleep", lambda seconds: None)
+    monkeypatch.setattr(sys, "argv", ["skt", "stops", "Lund", "--json"])
+    with pytest.raises(SystemExit, match="3"):
+        cli.main()
+    assert len(calls) == 3
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
