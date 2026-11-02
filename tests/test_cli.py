@@ -84,6 +84,7 @@ def test_bus_json_contract_and_filter(monkeypatch, capsys):
         "scheduled",
         "expected",
         "delayMinutes",
+        "timeOmitted",
     }
     assert result["from"] == {"id": "9021012081116000", "name": "Lund Jupitergatan"}
     assert trip["departure"] == "2026-11-02T06:09:00+01:00"
@@ -436,3 +437,19 @@ def test_command_deadline_terminates_child(monkeypatch, capsys):
     with pytest.raises(SystemExit, match="3"):
         cli.main()
     assert json.loads(capsys.readouterr().out)["error"]["code"] == 3
+
+
+def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
+    raw = fixture("journey-bus.json")
+    raw["journeys"][0]["routeLinks"][0]["from"].update(deviation=0, timeOmitted=True)
+    respond(monkeypatch, raw)
+    result = invoke(
+        monkeypatch, capsys, "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1", "--json"
+    )
+    stop = result["trips"][0]["legs"][0]["from"]
+    assert stop["timeOmitted"] is True and stop["expected"] is None and stop["delayMinutes"] is None
+    monkeypatch.setattr(
+        sys, "argv", ["skane", "trips", "1", "2", "--at", "2026-11-02 00:00", "--count", "1"]
+    )
+    cli._run()
+    assert "--:-- (scheduled 06:09)" in capsys.readouterr().out

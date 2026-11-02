@@ -123,7 +123,7 @@ def _clock(value: StopTime | Timing | None) -> str:
     if value is None:
         return "—"
     scheduled = value.scheduled.strftime("%H:%M")
-    if isinstance(value, Timing) and value.time_omitted:
+    if value.time_omitted:
         return f"--:-- (scheduled {scheduled})"
     if value.delay_minutes is None:
         return f"{scheduled} (scheduled)"

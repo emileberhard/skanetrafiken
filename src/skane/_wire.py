@@ -34,6 +34,7 @@ class StopTime(BaseModel):
     id2: str | None = None
     time: AwareDatetime
     deviation: StrictInt | None = None
+    timeOmitted: bool = False
     pos: str | None = None
     scheduledPos: str | None = None
 
