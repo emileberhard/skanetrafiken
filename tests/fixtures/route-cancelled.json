@@ -1,0 +1,223 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "2026-11-02T02:51:38Z",
+  "refreshRateSeconds": 30,
+  "stopHash": "b1e8dc5962084060a51809d79153f0d7",
+  "stops": [
+    {
+      "name": "Malmö C",
+      "id": "9021012080000000",
+      "departure": {
+        "time": "2026-11-02T04:23:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2b",
+      "scheduledPos": "Spår 2b"
+    },
+    {
+      "name": "Malmö Triangeln",
+      "id": "9021012080140000",
+      "arrival": {
+        "time": "2026-11-02T04:26:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:26:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    },
+    {
+      "name": "Malmö Hyllie",
+      "id": "9021012080040000",
+      "arrival": {
+        "time": "2026-11-02T04:30:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:31:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2b",
+      "scheduledPos": "Spår 2b"
+    },
+    {
+      "name": "Oxie station",
+      "id": "9021012080733000",
+      "arrival": {
+        "time": "2026-11-02T04:38:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:38:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    },
+    {
+      "name": "Svedala station",
+      "id": "9021012063069000",
+      "arrival": {
+        "time": "2026-11-02T04:44:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:44:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Skurup station",
+      "id": "9021012064073000",
+      "arrival": {
+        "time": "2026-11-02T04:55:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:55:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Rydsgård station",
+      "id": "9021012064072000",
+      "arrival": {
+        "time": "2026-11-02T04:59:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T04:59:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Svarte station",
+      "id": "9021012086311000",
+      "arrival": {
+        "time": "2026-11-02T05:07:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T05:07:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Ystad station",
+      "id": "9021012086239000",
+      "arrival": {
+        "time": "2026-11-02T05:14:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T05:16:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 3a"
+    },
+    {
+      "name": "Köpingebro station",
+      "id": "9021012086025000",
+      "arrival": {
+        "time": "2026-11-02T05:21:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "departure": {
+        "time": "2026-11-02T05:21:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Tomelilla station",
+      "id": "9021012070060000",
+      "arrival": {
+        "time": "2026-11-02T05:29:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "departure": {
+        "time": "2026-11-02T05:34:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Gärsnäs station",
+      "id": "9021012091152000",
+      "arrival": {
+        "time": "2026-11-02T05:43:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "departure": {
+        "time": "2026-11-02T05:43:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Simrishamn station",
+      "id": "9021012091069000",
+      "arrival": {
+        "time": "2026-11-02T05:53:00Z",
+        "timePoint": true,
+        "canceled": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    }
+  ]
+}

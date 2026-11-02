@@ -58,13 +58,13 @@ class Link(BaseModel):
     destination: StopTime = Field(alias="to")
     line: Line
     canceled: bool = False
-    deviations: list[Notice] = []
+    deviations: list[Notice]
 
 
 class Journey(BaseModel):
     noOfChanges: int
     routeLinks: list[Link] = Field(min_length=1)
-    deviationTag: Notice | None = None
+    deviationTags: list[Notice] = []
 
 
 class Journeys(BaseModel):

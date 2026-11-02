@@ -1,0 +1,176 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "2026-11-02T02:52:15Z",
+  "usedSearchTime": "2026-11-02T04:00:00Z",
+  "refreshRateSeconds": 30,
+  "id": "ac2470b0597e4154116c4b0baa4343ec",
+  "prevCursor": "MnxQUkVWSU9VU19QQUdFfDIwMjYtMTEtMDJUMDE6MTI6MDBafHwyaDQ4bXxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXx8fHx8fHw=",
+  "nextCursor": "MnxORVhUX1BBR0V8MjAyNi0xMS0wMlQwNjo0ODowMFp8fDJoNDhtfFNUUkVFVF9BTkRfQVJSSVZBTF9USU1FfHx8fHx8fA==",
+  "tooLongWalkJourneys": [],
+  "journeys": [
+    {
+      "id": 4,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAgAAAAMAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDg2MjM5MDQyAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDkxMDY5MDQxADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgxNzAxNzUzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "deviationTag": {
+        "text": "INSTÄLLD",
+        "prio": 2
+      },
+      "deviationTags": [
+        {
+          "text": "INSTÄLLD",
+          "prio": 2
+        }
+      ],
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398672045|2026-11-02",
+          "from": {
+            "name": "Ystad station",
+            "time": "2026-11-02T05:16:00Z",
+            "stopPointCoordinate": {
+              "lat": 55.427365,
+              "lon": 13.82533
+            },
+            "scheduledStopPointCoordinate": {
+              "lat": 55.427393,
+              "lon": 13.824318
+            },
+            "coordinate": {
+              "lat": 55.427543,
+              "lon": 13.825779
+            },
+            "id2": "9021012086239000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Simrishamn station",
+            "time": "2026-11-02T05:53:00Z",
+            "stopPointCoordinate": {
+              "lat": 55.554119,
+              "lon": 14.35283
+            },
+            "scheduledStopPointCoordinate": {
+              "lat": 55.554119,
+              "lon": 14.35283
+            },
+            "coordinate": {
+              "lat": 55.554461,
+              "lon": 14.352913
+            },
+            "id2": "9021012091069000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Pågatåg",
+            "type": "Train",
+            "no": "1753",
+            "lineNo": 12000817,
+            "lineNoString": "ST:SE:276:Line:9011012081700000",
+            "color": "FF716CB8",
+            "outlineColor": "FF6059A2",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Simrishamn",
+            "runNo": 1753,
+            "subType": "Pågatåg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012081701753"
+          },
+          "deviations": [
+            {
+              "text": "Tåget är inställt Ystad station - Simrishamn station. Orsaken är elfel. Vi hänvisar till övriga avgångar. ",
+              "prio": 2,
+              "infoLinks": []
+            }
+          ],
+          "canceled": true,
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAAAAAAvAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDg2MjM5MDA1AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDkxMDY5MDA1ADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDU3NzAwMDAzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "deviationTags": [
+        {
+          "text": "1 ANMÄRKNING",
+          "prio": 0
+        }
+      ],
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000372420911|2026-11-02",
+          "from": {
+            "name": "Ystad station",
+            "time": "2026-11-02T04:50:00Z",
+            "pos": "Läge E",
+            "stopPointCoordinate": {
+              "lat": 55.427783,
+              "lon": 13.827868
+            },
+            "scheduledPos": "Läge E",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.427783,
+              "lon": 13.827868
+            },
+            "coordinate": {
+              "lat": 55.427543,
+              "lon": 13.825779
+            },
+            "id2": "9021012086239000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Simrishamn station",
+            "time": "2026-11-02T05:58:00Z",
+            "pos": "Läge E",
+            "stopPointCoordinate": {
+              "lat": 55.554369,
+              "lon": 14.353455
+            },
+            "scheduledPos": "Läge E",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.554369,
+              "lon": 14.353455
+            },
+            "coordinate": {
+              "lat": 55.554461,
+              "lon": 14.352913
+            },
+            "id2": "9021012091069000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Regionbuss",
+            "type": "Bus",
+            "no": "577",
+            "lineNo": 12000577,
+            "lineNoString": "ST:SE:276:Line:9011012057700000",
+            "color": "FFFEC900",
+            "outlineColor": "FFCC9B00",
+            "iconColor": "FF3E3B39",
+            "towards": "mot Simrishamn via Skillinge",
+            "runNo": 3,
+            "subType": "Regional_Bus",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012057700003"
+          },
+          "deviations": [
+            {
+              "text": "Turen går skoldagar. För mer information, sök din resa på skanetrafiken.se, i appen, eller ring 0771-77 77 77",
+              "prio": 0
+            }
+          ],
+          "operatingDayDate": "2026-11-02"
+        }
+      ]
+    }
+  ]
+}

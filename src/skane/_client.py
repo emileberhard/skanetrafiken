@@ -186,7 +186,7 @@ def trips(
             if key in seen:
                 continue
             seen.add(key)
-            notices = (journey.deviationTag.text,) if journey.deviationTag else ()
+            notices = tuple(tag.text for tag in journey.deviationTags)
             found.append(Trip(departure, arrival, journey.noOfChanges, notices, legs))
         if len(found) >= count:
             break

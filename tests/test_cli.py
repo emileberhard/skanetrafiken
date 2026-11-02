@@ -463,3 +463,22 @@ def test_omitted_journey_stop_time_is_unknown(monkeypatch, capsys):
     )
     cli.main()
     assert "--:-- (scheduled 06:09)" in capsys.readouterr().out
+
+
+def test_trip_notices_list_every_deviation_tag(monkeypatch, capsys):
+    respond(monkeypatch, fixture("journey-cancelled.json"))
+    result = invoke(
+        monkeypatch,
+        capsys,
+        "trips",
+        "9021012086239000",
+        "9021012091069000",
+        "--at",
+        "2026-11-02 05:00",
+        "--json",
+    )
+    bus, train = result["trips"]
+    assert bus["notices"] == ["1 ANMÄRKNING"]
+    assert bus["legs"][0]["notices"][0].startswith("Turen går skoldagar.")
+    assert train["notices"] == ["INSTÄLLD"]
+    assert train["legs"][0]["notices"][0].startswith("Tåget är inställt Ystad station")
