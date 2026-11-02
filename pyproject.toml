@@ -5,9 +5,17 @@ build-backend = "uv_build"
 [project]
 name = "skane"
 version = "0.0.0"
-description = "A command-line journey planner for Skånetrafiken"
+description = "A Python library and CLI for Skånetrafiken journey planning"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
-dependencies = ["pydantic>=2.12,<3", "tzdata>=2025.1; sys_platform == 'win32'"]
+dependencies = ["pydantic>=2.12,<3", "tzdata>=2025.1"]
+
+[project.urls]
+Homepage = "https://github.com/emileberhard/skanetrafiken"
+Repository = "https://github.com/emileberhard/skanetrafiken"
+Issues = "https://github.com/emileberhard/skanetrafiken/issues"
 
 [project.scripts]
 skane = "skane.cli:main"
@@ -15,10 +23,8 @@ skane = "skane.cli:main"
 [dependency-groups]
 dev = ["pytest>=9", "ruff>=0.14", "ty>=0.0.1"]
 
-
 [tool.ruff]
 line-length = 100
-target-version = "py312"
 
 [tool.uv]
 exclude-newer = "12 hours"
