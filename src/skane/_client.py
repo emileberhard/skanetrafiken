@@ -27,10 +27,23 @@ ZONE = ZoneInfo("Europe/Stockholm")
 
 
 @dataclass(frozen=True, slots=True)
-class _Place:
+class _Endpoint:
     id: str
-    name: str
-    type: Literal["STOP_AREA", "LOCATION"]
+    name: str | None
+    wire_id: str
+    wire_type: Literal["STOP_AREA", "LOCATION"]
+
+
+def _coordinates(lat: float, lon: float) -> str:
+    return f"{lat},{lon}"
+
+
+def _stop_area(id: str, name: str | None) -> _Endpoint:
+    return _Endpoint(id, name, id, "STOP_AREA")
+
+
+def _location(lat: float, lon: float, name: str | None) -> _Endpoint:
+    return _Endpoint(_coordinates(lat, lon), name, f"{lat}#{lon}", "LOCATION")
 
 
 def stops(query: str) -> tuple[Place, ...]:
@@ -40,7 +53,7 @@ def stops(query: str) -> tuple[Place, ...]:
 def _stops(query: str, deadline: float) -> tuple[Place, ...]:
     return tuple(
         Place(
-            p.id2 if p.type == "STOP_AREA" else f"{p.lat},{p.lon}",
+            p.id2 if p.type == "STOP_AREA" else _coordinates(p.lat, p.lon),
             p.name,
             p.type,
             p.area,
@@ -51,21 +64,19 @@ def _stops(query: str, deadline: float) -> tuple[Place, ...]:
     )
 
 
-def _resolve(query: str | Place, deadline: float) -> _Place:
+def _resolve(query: str | Place, deadline: float) -> _Endpoint:
     if isinstance(query, Place):
-        return _Place(
-            query.id if query.type == "STOP_AREA" else f"{query.lat}#{query.lon}",
-            query.name,
-            "STOP_AREA" if query.type == "STOP_AREA" else "LOCATION",
-        )
+        if query.type == "STOP_AREA":
+            return _stop_area(query.id, query.name)
+        return _location(query.lat, query.lon, query.name)
     if re.fullmatch(r"\d+", query):
-        return _Place(query, query, "STOP_AREA")
+        return _stop_area(query, None)
     match = re.fullmatch(r"\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*", query)
     if match:
         lat, lon = map(float, match.groups())
         if not (-90 <= lat <= 90 and -180 <= lon <= 180):
             raise UsageError(f"Invalid coordinates {query!r}.")
-        return _Place(f"{lat}#{lon}", query, "LOCATION")
+        return _location(lat, lon, None)
     candidates = _stops(query, deadline)
     exact = [p for p in candidates if p.name.casefold() == query.casefold()]
     if len(exact) != 1:
@@ -151,10 +162,10 @@ def trips(
         start, end = (future.result() for future in futures)
     arrive_by = isinstance(when, ArriveBy)
     params = {
-        "fromPointId": start.id,
-        "fromPointType": start.type,
-        "toPointId": end.id,
-        "toPointType": end.type,
+        "fromPointId": start.wire_id,
+        "fromPointType": start.wire_type,
+        "toPointId": end.wire_id,
+        "toPointType": end.wire_type,
         "arrival": str(arrive_by).lower(),
         "priority": "SHORTEST_TIME",
         "journeysAfter": "10",
@@ -198,9 +209,17 @@ def trips(
     found.sort(key=lambda item: item.departure.timestamp())
     found = found[-count:] if arrive_by else found[:count]
     first = found[0] if found else None
-    start_name = first.legs[0].origin.name if first and start.name == start.id else start.name
-    end_name = first.legs[-1].destination.name if first and end.name == end.id else end.name
-    return Trips(PlaceRef(start.id, start_name), PlaceRef(end.id, end_name), tuple(found))
+    return Trips(
+        _place_ref(start, first.legs[0].origin if first else None),
+        _place_ref(end, first.legs[-1].destination if first else None),
+        tuple(found),
+    )
+
+
+def _place_ref(end: _Endpoint, stop: StopTime | None) -> PlaceRef:
+    if end.name is None and end.wire_type == "STOP_AREA" and stop is not None:
+        return PlaceRef(end.id, stop.name)
+    return PlaceRef(end.id, end.name)
 
 
 def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:

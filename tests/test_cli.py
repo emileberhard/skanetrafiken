@@ -184,12 +184,15 @@ def test_returned_places_are_reusable(monkeypatch, capsys):
 
     respond(monkeypatch, journey)
     when = skane.DepartAt(datetime(2026, 11, 2, 0, 0, tzinfo=UTC))
-    skane.trips(chosen, "9021012081216000", when, count=1)
+    result = skane.trips(chosen, "9021012081216000", when, count=1)
     assert requests[0]["fromPointType"] == ["LOCATION"]
     assert requests[0]["fromPointId"] == [f"{chosen.lat}#{chosen.lon}"]
+    assert result.origin == skane.PlaceRef(chosen.id, chosen.name)
     requests.clear()
-    skane.trips(chosen.id, "9021012081216000", when, count=1)
+    again = skane.trips(result.origin.id, "9021012081216000", when, count=1)
     assert requests[0]["fromPointType"] == ["LOCATION"]
+    assert requests[0]["fromPointId"] == [f"{chosen.lat}#{chosen.lon}"]
+    assert again.origin == skane.PlaceRef(chosen.id, None)
 
 
 def test_invalid_upstream_response_and_boolean_delay_exit_4(monkeypatch, capsys):
@@ -291,6 +294,8 @@ def test_walk_distance_and_train_mode(monkeypatch, capsys):
         "1",
         "--json",
     )
+    assert result["from"] == {"id": "55.603,13.003", "name": None}
+    assert result["to"] == {"id": "9021012081216000", "name": "Lund C"}
     walk, train = result["trips"][0]["legs"]
     assert (walk["mode"], walk["distanceMeters"], walk["line"]) == ("walk", 903, None)
     assert train["mode"] == "train"
