@@ -50,7 +50,7 @@ class Place(_Serializable):
 @dataclass(frozen=True, slots=True)
 class PlaceRef(_Serializable):
     id: str
-    name: str
+    name: str | None
 
 
 @dataclass(frozen=True, slots=True)
