@@ -337,7 +337,10 @@ def test_walk_distance_and_train_mode(monkeypatch, capsys):
     assert result["to"] == {"id": "9021012081216000", "name": "Lund C"}
     walk, train = result["trips"][0]["legs"]
     assert (walk["mode"], walk["distanceMeters"], walk["line"]) == ("walk", 903, None)
+    assert walk["id"] is None
     assert train["mode"] == "train"
+    assert train["id"] == "ST¤SE¤276¤ServiceJourney¤1120000388330585|2026-11-01"
+    assert (train["from"]["platform"], train["from"]["scheduledPlatform"]) == ("Spår 4a", "Spår 3a")
     walk_line = raw["journeys"][0]["routeLinks"][0]["line"]
     walk_line["distance"] = "1,2 km"
     result = invoke(
