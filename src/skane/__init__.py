@@ -1,9 +1,9 @@
-from skane._client import leg_stops, stops, trips
+from skane._client import stops, trips, vehicle_trip
 from skane._errors import (
-    AmbiguousPlaceError,
     InvalidResponseError,
     SkaneError,
     UnavailableError,
+    UnresolvedPlaceError,
     UsageError,
 )
 from skane._models import (
@@ -21,7 +21,6 @@ from skane._models import (
 )
 
 __all__ = [
-    "AmbiguousPlaceError",
     "ArriveBy",
     "DepartAt",
     "InvalidResponseError",
@@ -34,10 +33,11 @@ __all__ = [
     "Trip",
     "Trips",
     "UnavailableError",
+    "UnresolvedPlaceError",
     "UsageError",
     "VehicleStop",
     "VehicleTrip",
-    "leg_stops",
     "stops",
     "trips",
+    "vehicle_trip",
 ]

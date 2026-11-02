@@ -7,7 +7,7 @@ from typing import Literal
 from zoneinfo import ZoneInfo
 
 from skane import _wire
-from skane._errors import AmbiguousPlaceError, UsageError
+from skane._errors import UnresolvedPlaceError, UsageError
 from skane._models import (
     ArriveBy,
     DepartAt,
@@ -79,7 +79,7 @@ def _resolve(query: str | Place, deadline: float) -> _Endpoint:
     candidates = _stops(query, deadline)
     exact = [p for p in candidates if p.name.casefold() == query.casefold()]
     if len(exact) != 1:
-        raise AmbiguousPlaceError(query, candidates)
+        raise UnresolvedPlaceError(query, candidates)
     return _resolve(exact[0], deadline)
 
 
@@ -218,6 +218,6 @@ def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:
     )
 
 
-def leg_stops(leg_id: str) -> VehicleTrip:
-    response = _wire.leg_stops(leg_id, time.monotonic() + _wire.DEADLINE_SECONDS)
+def vehicle_trip(leg_id: str) -> VehicleTrip:
+    response = _wire.vehicle_trip(leg_id, time.monotonic() + _wire.DEADLINE_SECONDS)
     return VehicleTrip(tuple(_vehicle_stop(stop) for stop in response.stops))

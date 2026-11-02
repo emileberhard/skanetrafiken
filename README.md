@@ -25,6 +25,6 @@ for trip in result.trips:
     print(trip.departure, trip.arrival)
 ```
 
-Immutable models expose `to_dict()` and `to_json()` with the same fields as CLI JSON. Times are aware `datetime` values in Europe/Stockholm; input datetimes must be timezone-aware. Missing realtime values are `None`, not zero. Names must match exactly, ignoring case; `stops()` returns reusable `Place` values. Failures derive from `SkaneError`: `UsageError`, `UnavailableError` and `InvalidResponseError`. Ambiguous matches raise `AmbiguousPlaceError` with candidates.
+Immutable models expose `to_dict()` and `to_json()` with the same fields as CLI JSON. Times are aware `datetime` values in Europe/Stockholm; input datetimes must be timezone-aware. Missing realtime values are `None`, not zero. Names must match exactly, ignoring case; `stops()` returns reusable `Place` values. Failures derive from `SkaneError`: `UsageError`, `UnavailableError` and `InvalidResponseError`. A name that matches no single place raises `UnresolvedPlaceError` with the candidates. `vehicle_trip(leg_id)` returns every stop of the vehicle that runs a leg.
 
 Use `skane --help` and each command's `--help` for options and exit codes. Development: `uv sync --locked`, then `just check`.

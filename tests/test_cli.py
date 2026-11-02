@@ -172,9 +172,9 @@ def test_on_time_and_timetable_are_distinct_in_human_output(monkeypatch, capsys)
     assert "06:09 (on time)" in capsys.readouterr().out
 
 
-def test_ambiguous_place_has_structured_candidates_and_cli_exit_2(monkeypatch, capsys):
+def test_unresolved_place_has_structured_candidates_and_cli_exit_2(monkeypatch, capsys):
     respond(monkeypatch, fixture("points.json"))
-    with pytest.raises(skane.AmbiguousPlaceError) as caught:
+    with pytest.raises(skane.UnresolvedPlaceError) as caught:
         skane.trips("Jupitergatan", "123", skane.DepartAt(datetime(2026, 11, 2, tzinfo=UTC)))
     assert caught.value.query == "Jupitergatan"
     assert any(

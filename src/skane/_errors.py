@@ -14,11 +14,11 @@ class UsageError(SkaneError):
     pass
 
 
-class AmbiguousPlaceError(UsageError):
+class UnresolvedPlaceError(UsageError):
     def __init__(self, query: str, candidates: tuple[Place, ...]):
         self.query = query
         self.candidates = candidates
-        super().__init__(f"Place {query!r} does not resolve to exactly one name.")
+        super().__init__(f"Place {query!r} does not match exactly one name.")
 
 
 class UnavailableError(SkaneError):

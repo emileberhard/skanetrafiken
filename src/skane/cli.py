@@ -8,7 +8,7 @@ from typing import Never
 from zoneinfo import ZoneInfo
 
 from skane import (
-    AmbiguousPlaceError,
+    UnresolvedPlaceError,
     ArriveBy,
     DepartAt,
     InvalidResponseError,
@@ -19,7 +19,7 @@ from skane import (
     Trips,
     UsageError,
     VehicleTrip,
-    leg_stops,
+    vehicle_trip,
     stops,
     trips,
 )
@@ -161,7 +161,7 @@ def _leg(result: VehicleTrip) -> None:
 
 
 def _report_error(error: SkaneError, as_json: bool) -> Never:
-    if isinstance(error, AmbiguousPlaceError):
+    if isinstance(error, UnresolvedPlaceError):
         choices = "; ".join(f"{p.name} ({p.id}, {p.type})" for p in error.candidates)
         message = f"{error} Candidates: {choices or 'none'}; choose an exact name, stop ID or coordinates."
     else:
@@ -197,7 +197,7 @@ def main() -> None:
             result = trips(args.origin, args.destination, when, line=args.line, count=args.count)
             print(result.to_json()) if args.json else _trips(result)
         else:
-            result = leg_stops(args.leg_id)
+            result = vehicle_trip(args.leg_id)
             print(result.to_json()) if args.json else _leg(result)
     except SkaneError as exc:
         _report_error(exc, wants_json)
