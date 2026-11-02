@@ -84,18 +84,28 @@ def _resolve(query: str | Place, deadline: float) -> _Endpoint:
     return _resolve(exact[0], deadline)
 
 
-def _stop_time(stop: _wire.StopTime) -> StopTime:
-    deviation = None if stop.timeOmitted else stop.deviation
-    expected = stop.time + timedelta(minutes=deviation) if deviation is not None else None
-    return StopTime(
-        stop.id2,
-        stop.name,
-        stop.pos,
-        stop.scheduledPos,
-        stop.time.astimezone(ZONE),
+def _timing(scheduled: datetime, deviation: int | None, omitted: bool) -> Timing:
+    delay = None if omitted else deviation
+    expected = None if delay is None else scheduled + timedelta(minutes=delay)
+    return Timing(
+        scheduled.astimezone(ZONE),
         expected.astimezone(ZONE) if expected else None,
-        deviation,
-        stop.timeOmitted,
+        delay,
+        omitted,
+    )
+
+
+def _stop_time(stop: _wire.StopTime) -> StopTime:
+    timing = _timing(stop.time, stop.deviation, stop.timeOmitted)
+    return StopTime(
+        id=stop.id2,
+        name=stop.name,
+        platform=stop.pos,
+        scheduled_platform=stop.scheduledPos,
+        scheduled=timing.scheduled,
+        expected=timing.expected,
+        delay_minutes=timing.delay_minutes,
+        time_omitted=timing.time_omitted,
     )
 
 
@@ -129,19 +139,6 @@ def _leg(link: _wire.Link) -> Leg:
         origin=_stop_time(link.origin),
         destination=_stop_time(link.destination),
         distance_meters=_distance_meters(line.distance) if mode == "walk" else None,
-    )
-
-
-def _timing(value: _wire.Timing | None) -> Timing | None:
-    if value is None:
-        return None
-    deviation = None if value.timeOmitted else value.deviation
-    expected = value.time + timedelta(minutes=deviation) if deviation is not None else None
-    return Timing(
-        value.time.astimezone(ZONE),
-        expected.astimezone(ZONE) if expected else None,
-        deviation,
-        value.timeOmitted,
     )
 
 
@@ -222,14 +219,18 @@ def _place_ref(end: _Endpoint, stop: StopTime | None) -> PlaceRef:
     return PlaceRef(end.id, end.name)
 
 
+def _call_timing(call: _wire.Timing | None) -> Timing | None:
+    return None if call is None else _timing(call.time, call.deviation, call.timeOmitted)
+
+
 def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:
     return VehicleStop(
         stop.id,
         stop.name,
         stop.pos,
         stop.scheduledPos,
-        _timing(stop.arrival),
-        _timing(stop.departure),
+        _call_timing(stop.arrival),
+        _call_timing(stop.departure),
         any(t.canceled for t in (stop.arrival, stop.departure) if t),
     )
 
