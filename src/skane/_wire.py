@@ -200,11 +200,14 @@ def _deliver(
 def _open(request: Request, timeout: float) -> _Reply:
     try:
         with urlopen(request, timeout=timeout) as response:
-            return _Reply(response.status, response.read(), response.headers.get_content_type(), None)
+            return _Reply(
+                response.status, response.read(), response.headers.get_content_type(), None
+            )
     except HTTPError as exc:
-        return _Reply(
-            exc.code, exc.read(), exc.headers.get_content_type(), exc.headers.get("Retry-After")
-        )
+        with exc:
+            return _Reply(
+                exc.code, exc.read(), exc.headers.get_content_type(), exc.headers.get("Retry-After")
+            )
 
 
 def _retry_after(header: str | None, now: datetime) -> float:
