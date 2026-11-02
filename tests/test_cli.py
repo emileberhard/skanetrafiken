@@ -1,6 +1,8 @@
 import io
+import itertools
 import json
 import sys
+import threading
 from datetime import UTC, datetime
 from email.message import Message
 from http.client import IncompleteRead
@@ -596,3 +598,24 @@ def test_non_json_success_is_unavailable_not_a_changed_api(monkeypatch, capsys):
     )
     code, error = fail(monkeypatch, capsys, "stops", "Lund")
     assert code == 3 and "text/html instead of JSON" in error["message"]
+
+
+def test_stalled_request_is_abandoned_at_the_deadline(monkeypatch, capsys):
+    released = threading.Event()
+    calls = []
+
+    def stall(request, timeout):
+        calls.append(timeout)
+        released.wait()
+        raise OSError("released after the test")
+
+    ticks = itertools.chain([0.0], itertools.repeat(29.95))
+    monkeypatch.setattr(_wire.time, "monotonic", lambda: next(ticks))
+    monkeypatch.setattr(_wire.time, "sleep", lambda seconds: None)
+    monkeypatch.setattr(_wire, "urlopen", stall)
+    try:
+        code, error = fail(monkeypatch, capsys, "stops", "Lund")
+    finally:
+        released.set()
+    assert (code, len(calls)) == (3, 3)
+    assert "no complete response" in error["message"]

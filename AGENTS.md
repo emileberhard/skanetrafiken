@@ -22,7 +22,7 @@ Never fuzzy-select a place. Resolve both names concurrently. Preserve an absent 
 
 The public planner API avoids a keyed server but is undocumented and can change. The wire boundary owns its validation and errors. Recorded public fixtures guard parsing but cannot see upstream drift, so fields the API always sends are required and a rename fails loudly; optional fields default only to what their observed absence means. Once consumers use the JSON and Python contracts, changing field semantics or model shapes is expensive. Independent lookups run concurrently; pages are sequential because each needs the prior cursor.
 
-Each public operation owns one monotonic 30-second budget shared by lookups, pages and retries. Request and retry waits use the remaining budget. Python's blocking HTTP timeout is per operation rather than a hard total bound, so stalled DNS or a response that keeps producing bytes can exceed the budget; a strict wall-clock guarantee would require a cancellable transport. A bare `HH:MM` is today in Stockholm, including past times; ambiguous or nonexistent local times require an offset.
+Each public operation owns one monotonic 30-second budget shared by lookups, pages and retries. Request and retry waits use the remaining budget. urllib's timeout bounds single socket operations but not DNS or a slowly dripping body, so each attempt runs in a daemon thread that the caller abandons at the attempt's wall-clock limit; an abandoned GET may finish unseen in the background. A bare `HH:MM` is today in Stockholm, including past times; ambiguous or nonexistent local times require an offset.
 
 ## Commands and release
 

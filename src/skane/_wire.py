@@ -1,5 +1,6 @@
 import random
 import re
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -8,6 +9,7 @@ from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
 from importlib.metadata import version
+from queue import SimpleQueue
 from typing import Annotated
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
@@ -174,6 +176,28 @@ def _remaining(deadline: float) -> float:
 
 
 def _fetch(request: Request, timeout: float) -> _Reply:
+    replies: SimpleQueue[_Reply | OSError | HTTPException] = SimpleQueue()
+    worker = threading.Thread(target=_deliver, args=(request, timeout, replies), daemon=True)
+    worker.start()
+    worker.join(timeout)
+    if worker.is_alive():
+        raise TimeoutError(f"no complete response within {timeout:.1f} seconds")
+    reply = replies.get_nowait()
+    if isinstance(reply, _Reply):
+        return reply
+    raise reply
+
+
+def _deliver(
+    request: Request, timeout: float, replies: SimpleQueue[_Reply | OSError | HTTPException]
+) -> None:
+    try:
+        replies.put(_open(request, timeout))
+    except (OSError, HTTPException) as exc:
+        replies.put(exc)
+
+
+def _open(request: Request, timeout: float) -> _Reply:
     try:
         with urlopen(request, timeout=timeout) as response:
             return _Reply(response.status, response.read(), response.headers.get_content_type(), None)
