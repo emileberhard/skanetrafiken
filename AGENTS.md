@@ -26,4 +26,4 @@ Each public operation owns one monotonic 30-second budget shared by lookups, pag
 
 ## Commands and release
 
-`just check` runs locked sync, Ruff, ty and pytest. CI checks Python 3.12–3.15 and builds both distributions once. Plain annotated `MAJOR.MINOR.PATCH` tags on main, newer than other version tags and with passing main CI, build versioned wheel and sdist and publish with attestations to PyPI through OIDC in the `pypi` environment, then publish a GitHub release with tag notes. Invalid tags fail. Recover by issuing a new higher patch tag; never overwrite a release.
+`just check` runs locked sync, Ruff, ty and pytest. CI checks Python 3.12–3.15, builds both distributions once and runs the built wheel in an isolated environment. Plain annotated `MAJOR.MINOR.PATCH` tags on main, newer than other version tags and with passing main CI, build versioned wheel and sdist, check that the wheel reports the tag as its version, and publish with attestations to PyPI through OIDC in the `pypi` environment, then publish a GitHub release with tag notes. Invalid tags fail. Recover by issuing a new higher patch tag; never overwrite a release.

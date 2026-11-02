@@ -46,7 +46,8 @@ jobs:
       - name: Build versioned distributions
         run: |
           uv version "$VERSION" --frozen
-          uv build
+          uv build --no-sources
+          test "$(uv run --isolated --no-project --with dist/*.whl skane --version)" = "skane $VERSION"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: distributions
@@ -55,6 +56,7 @@ jobs:
   publish-pypi:
     needs: build
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     environment: pypi
     permissions:
       id-token: write
@@ -67,6 +69,7 @@ jobs:
   publish-github:
     needs: [build, publish-pypi]
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     permissions:
       contents: write
     env:
