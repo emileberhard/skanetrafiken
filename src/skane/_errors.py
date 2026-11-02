@@ -1,17 +1,24 @@
-from typing import ClassVar
+from skane._models import Place
 
 
 class SkaneError(Exception):
-    code: ClassVar[int]
+    pass
 
 
 class UsageError(SkaneError):
-    code = 2
+    pass
+
+
+class AmbiguousPlaceError(UsageError):
+    def __init__(self, query: str, candidates: tuple[Place, ...]):
+        self.query = query
+        self.candidates = candidates
+        super().__init__(f"Place {query!r} does not resolve to exactly one name.")
 
 
 class UnavailableError(SkaneError):
-    code = 3
+    pass
 
 
 class InvalidResponseError(SkaneError):
-    code = 4
+    pass

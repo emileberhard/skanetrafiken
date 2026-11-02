@@ -3,6 +3,15 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any
 
+JSON_NAMES = {
+    "origin": "from",
+    "destination": "to",
+    "scheduled_platform": "scheduledPlatform",
+    "delay_minutes": "delayMinutes",
+    "distance_meters": "distanceMeters",
+    "time_omitted": "timeOmitted",
+}
+
 
 def _json_value(value: Any) -> Any:
     if isinstance(value, datetime):
@@ -10,13 +19,7 @@ def _json_value(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_json_value(item) for item in value]
     if isinstance(value, dict):
-        aliases = {"origin": "from", "destination": "to"}
-        return {
-            aliases.get(
-                key, key.split("_")[0] + "".join(part.title() for part in key.split("_")[1:])
-            ): _json_value(item)
-            for key, item in value.items()
-        }
+        return {JSON_NAMES.get(key, key): _json_value(item) for key, item in value.items()}
     return value
 
 
@@ -63,17 +66,15 @@ class Leg(_Serializable):
     name: str
     line: str | None
     towards: str | None
-    color: str | None
-    text_color: str | None
     cancelled: bool
     notices: tuple[str, ...]
     origin: StopTime
     destination: StopTime
-    distance: str | float | None
+    distance_meters: int | None
 
 
 @dataclass(frozen=True, slots=True)
-class Journey(_Serializable):
+class Trip(_Serializable):
     departure: datetime
     arrival: datetime
     changes: int
@@ -85,7 +86,7 @@ class Journey(_Serializable):
 class Trips(_Serializable):
     origin: PlaceRef
     destination: PlaceRef
-    trips: tuple[Journey, ...]
+    trips: tuple[Trip, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +94,7 @@ class Timing(_Serializable):
     scheduled: datetime
     expected: datetime | None
     delay_minutes: int | None
+    time_omitted: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,9 +105,19 @@ class VehicleStop(_Serializable):
     scheduled_platform: str | None
     arrival: Timing | None
     departure: Timing | None
+    cancelled: bool
 
 
 @dataclass(frozen=True, slots=True)
 class VehicleTrip(_Serializable):
     stops: tuple[VehicleStop, ...]
-    refresh_rate_seconds: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class DepartAt:
+    time: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class ArriveBy:
+    time: datetime
