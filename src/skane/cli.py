@@ -3,12 +3,12 @@ import json
 import os
 import re
 import sys
+from dataclasses import dataclass
 from datetime import datetime, time
 from typing import Never
 from zoneinfo import ZoneInfo
 
 from skane import (
-    UnresolvedPlaceError,
     ArriveBy,
     DepartAt,
     InvalidResponseError,
@@ -17,15 +17,44 @@ from skane import (
     StopTime,
     Timing,
     Trips,
+    UnavailableError,
+    UnresolvedPlaceError,
     UsageError,
     VehicleTrip,
-    vehicle_trip,
     stops,
     trips,
+    vehicle_trip,
 )
-from skane._wire import VERSION
+from skane._models import JSONValue
+from skane._wire import DEADLINE_SECONDS, VERSION
 
 ZONE = ZoneInfo("Europe/Stockholm")
+
+
+@dataclass(frozen=True, slots=True)
+class _Failure:
+    kind: str
+    exit_code: int
+    meaning: str
+
+
+_FAILURES: dict[type[SkaneError], _Failure] = {
+    UnresolvedPlaceError: _Failure("unresolved_place", 2, "a place matches no single name"),
+    UsageError: _Failure("usage", 2, "invalid arguments"),
+    UnavailableError: _Failure(
+        "unavailable",
+        3,
+        f"Skånetrafiken unavailable or the {DEADLINE_SECONDS}-second deadline passed",
+    ),
+    InvalidResponseError: _Failure(
+        "invalid_response", 4, "Skånetrafiken's response changed and skane needs repair"
+    ),
+}
+EXIT_CODES = (
+    "Exit codes: 0 success; 1 internal error; "
+    + "; ".join(f"{f.exit_code} {f.kind}: {f.meaning}" for f in _FAILURES.values())
+    + '. With --json, failures print {"error": {"kind", "message"}} to stdout.'
+)
 
 
 class Parser(argparse.ArgumentParser):
@@ -37,7 +66,8 @@ def parser() -> Parser:
     p = Parser(
         prog="skane",
         description="Plan Skåne public transport journeys.",
-        epilog="Exit codes: 0 success, 2 usage or ambiguous place, 3 API unavailable or deadline exceeded, 4 upstream response changed. Example: skane trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json",
+        epilog="Example: skane trips 'Lund Jupitergatan' 'Malmö Kungsgatan' --line 171 --json. "
+        + EXIT_CODES,
     )
     p.add_argument("--version", action="version", version=f"skane {VERSION}")
     sub = p.add_subparsers(dest="command", required=True, parser_class=Parser)
@@ -72,10 +102,7 @@ def parser() -> Parser:
     )
     leg.add_argument("leg_id", metavar="LEG_ID")
     for child in (places, journey, leg):
-        child.epilog = (
-            (child.epilog or "")
-            + " Exit codes: 0 success; 2 usage or ambiguous place; 3 API failure or deadline exceeded; 4 invalid upstream response."
-        )
+        child.epilog = f"{child.epilog}. {EXIT_CODES}"
         child.add_argument("--json", action="store_true", help="Output JSON, including errors")
     return p
 
@@ -161,44 +188,52 @@ def _leg(result: VehicleTrip) -> None:
 
 
 def _report_error(error: SkaneError, as_json: bool) -> Never:
-    if isinstance(error, UnresolvedPlaceError):
-        choices = "; ".join(f"{p.name} ({p.id}, {p.type})" for p in error.candidates)
-        message = f"{error} Candidates: {choices or 'none'}; choose an exact name, stop ID or coordinates."
-    else:
-        message = str(error)
-    code = (
-        2 if isinstance(error, UsageError) else 4 if isinstance(error, InvalidResponseError) else 3
-    )
+    failure = next(f for kind, f in _FAILURES.items() if isinstance(error, kind))
     if as_json:
-        print(json.dumps({"error": {"code": code, "message": message}}, ensure_ascii=False))
+        report: dict[str, JSONValue] = {"kind": failure.kind, "message": str(error)}
+        if isinstance(error, UnresolvedPlaceError):
+            report["candidates"] = [place.to_dict() for place in error.candidates]
+        print(json.dumps({"error": report}, ensure_ascii=False))
+    elif isinstance(error, UnresolvedPlaceError):
+        choices = "; ".join(f"{p.name} ({p.id}, {p.type})" for p in error.candidates)
+        print(f"skane: {error} Candidates: {choices or 'none'}.", file=sys.stderr)
     else:
-        print(f"skane: {message}", file=sys.stderr)
-    sys.exit(code)
+        print(f"skane: {error}", file=sys.stderr)
+    sys.exit(failure.exit_code)
+
+
+def _run(args: argparse.Namespace) -> None:
+    if args.command == "stops":
+        places = stops(args.query)
+        if args.json:
+            print(json.dumps({"places": [p.to_dict() for p in places]}, ensure_ascii=False))
+        else:
+            _places(places)
+    elif args.command == "trips":
+        when = (
+            DepartAt(local_time(args.at))
+            if args.at
+            else ArriveBy(local_time(args.arrive_by))
+            if args.arrive_by
+            else None
+        )
+        journeys = trips(args.origin, args.destination, when, line=args.line, count=args.count)
+        if args.json:
+            print(journeys.to_json())
+        else:
+            _trips(journeys)
+    else:
+        vehicle = vehicle_trip(args.leg_id)
+        if args.json:
+            print(vehicle.to_json())
+        else:
+            _leg(vehicle)
 
 
 def main() -> None:
     wants_json = "--json" in sys.argv[1:]
     try:
-        args = parser().parse_args()
-        if args.command == "stops":
-            result = stops(args.query)
-            if args.json:
-                print(json.dumps([place.to_dict() for place in result], ensure_ascii=False))
-            else:
-                _places(result)
-        elif args.command == "trips":
-            when = (
-                DepartAt(local_time(args.at))
-                if args.at
-                else ArriveBy(local_time(args.arrive_by))
-                if args.arrive_by
-                else None
-            )
-            result = trips(args.origin, args.destination, when, line=args.line, count=args.count)
-            print(result.to_json()) if args.json else _trips(result)
-        else:
-            result = vehicle_trip(args.leg_id)
-            print(result.to_json()) if args.json else _leg(result)
+        _run(parser().parse_args())
     except SkaneError as exc:
         _report_error(exc, wants_json)
 
