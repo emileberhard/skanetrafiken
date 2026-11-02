@@ -1,0 +1,997 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "2026-11-02T01:36:52Z",
+  "usedSearchTime": "2026-11-02T01:36:00Z",
+  "refreshRateSeconds": 30,
+  "id": "cb9958676b110851363ca15948d9e086:cb9958676b110851363ca15948d9e086",
+  "journeys": [
+    {
+      "id": 0,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMQAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMTgxXzIwMjYxMTAx",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000399869083|2026-11-01",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T01:35:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "passed": true,
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T02:15:00Z",
+            "pos": "Spår: Invänta information",
+            "deviation": -5,
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1181",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1181,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201181"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-01"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 1,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMQAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMTg5XzIwMjYxMTAx",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398899721|2026-11-01",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T02:35:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T03:10:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1189",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1189,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201189"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-01"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 2,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMQAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMzAxMDAxXzIwMjYxMTAx",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000399290337|2026-11-01",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T03:05:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T03:43:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1001",
+            "lineNo": 12000803,
+            "lineNoString": "ST:SE:276:Line:9011012080300000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1001,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080301001"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-01"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 3,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMDA1XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398898708|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T03:35:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T04:13:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1005",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1005,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201005"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 4,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAEAAAAHAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNDAxMDA3XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398265837|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T03:52:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T04:28:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1007",
+            "lineNo": 12000804,
+            "lineNoString": "ST:SE:276:Line:9011012080400000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1007,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080401007"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 5,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMzAxMDA5XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398888625|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T04:05:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T04:44:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1009",
+            "lineNo": 12000803,
+            "lineNoString": "ST:SE:276:Line:9011012080300000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1009,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080301009"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 6,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMDEzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398898727|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T04:35:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T05:13:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1013",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1013,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201013"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 7,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAMAAAAJAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNDAxMDE1XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398265857|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T04:50:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T05:28:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1015",
+            "lineNo": 12000804,
+            "lineNoString": "ST:SE:276:Line:9011012080400000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1015,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080401015"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 8,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAIAAAAIAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMzAxMDE3XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398888644|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T05:05:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T05:44:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1017",
+            "lineNo": 12000803,
+            "lineNoString": "ST:SE:276:Line:9011012080300000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1017,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080301017"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 9,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAQAAAAKAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNTAxMDE5XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000397239513|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T05:20:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T05:58:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1019",
+            "lineNo": 12000805,
+            "lineNoString": "ST:SE:276:Line:9011012080500000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1019,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080501019"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 10,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAMAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMjAxMDIxXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398898750|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T05:35:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T06:13:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1021",
+            "lineNo": 12000802,
+            "lineNoString": "ST:SE:276:Line:9011012080200000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1021,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080201021"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 11,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAcAAAANAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQzADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNDAxMDIzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398265899|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T05:50:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T06:28:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1023",
+            "lineNo": 12000804,
+            "lineNoString": "ST:SE:276:Line:9011012080400000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1023,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080401023"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 12,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAMAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNjAxMzIzXzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000397530013|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T05:59:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T06:35:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1323",
+            "lineNo": 12000806,
+            "lineNoString": "ST:SE:276:Line:9011012080600000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1323,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080601323"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 13,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAkAAAAPAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwMzAxMDI1XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000398889337|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T06:05:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T06:44:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1025",
+            "lineNo": 12000803,
+            "lineNoString": "ST:SE:276:Line:9011012080300000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1025,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080301025"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 14,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAQAAAAKAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNTAxMDI3XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000397529770|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T06:20:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T06:58:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1027",
+            "lineNo": 12000805,
+            "lineNoString": "ST:SE:276:Line:9011012080500000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1027,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080501027"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    },
+    {
+      "id": 15,
+      "journeyKey": "2;rO0ABXe3AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKMjAyNi0xMS0wMgAAAAYAAAAMAB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDgwMDAwMDE2AB9TVDpTRToyNzY6UXVheTo5MDIyMDEyMDQ1MDA3MDQyADdTVDpTRToyNzY6RGF0ZWRTZXJ2aWNlSm91cm5leTo5MDE1MDEyMDgwNjAxMzI1XzIwMjYxMTAy",
+      "sequenceNo": 0,
+      "noOfChanges": 0,
+      "routeLinks": [
+        {
+          "id": "ST¤SE¤276¤ServiceJourney¤1120000397530082|2026-11-02",
+          "from": {
+            "name": "Malmö C",
+            "time": "2026-11-02T06:29:00Z",
+            "pos": "Spår 1b",
+            "stopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "scheduledPos": "Spår 1b",
+            "scheduledStopPointCoordinate": {
+              "lat": 55.609771,
+              "lon": 12.999684
+            },
+            "coordinate": {
+              "lat": 55.608777,
+              "lon": 13.000216
+            },
+            "id2": "9021012080000000",
+            "timePoint": true
+          },
+          "to": {
+            "name": "Köpenhamn H",
+            "time": "2026-11-02T07:06:00Z",
+            "pos": "Spår: Invänta information",
+            "coordinate": {
+              "lat": 55.672692,
+              "lon": 12.564631
+            },
+            "id2": "9021012045007000",
+            "timePoint": true
+          },
+          "line": {
+            "name": "Öresundståg",
+            "type": "TrainOresund",
+            "no": "1325",
+            "lineNo": 12000806,
+            "lineNoString": "ST:SE:276:Line:9011012080600000",
+            "color": "FF706C6A",
+            "outlineColor": "FF3E3B39",
+            "iconColor": "FFFFFFFF",
+            "towards": "mot Østerport",
+            "runNo": 1325,
+            "subType": "Öresundståg",
+            "occupancySupport": false,
+            "operatorId": "ST:SE:276:Authority:9010012000000000",
+            "operatorName": "Skånetrafiken",
+            "gid": "9015012080601325"
+          },
+          "deviations": [],
+          "operatingDayDate": "2026-11-02"
+        }
+      ],
+      "transportMode": "Bridge"
+    }
+  ],
+  "prevCursor": "MnxQUkVWSU9VU19QQUdFfDIwMjYtMTEtMDFUMjI6NDU6MDBafHwyaDM2bXxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXx8fHx8fHw=",
+  "nextCursor": "MnxORVhUX1BBR0V8MjAyNi0xMS0wMlQwNjozMzowMFp8fDJoMzZtfFNUUkVFVF9BTkRfQVJSSVZBTF9USU1FfHx8fHx8fA==",
+  "tooLongWalkJourneys": []
+}

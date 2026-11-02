@@ -1,0 +1,199 @@
+{
+  "api": "se.skanetrafiken.api",
+  "time": "2026-11-02T01:37:00Z",
+  "refreshRateSeconds": 30,
+  "stopHash": "64a0cee533200e482f4d10dc5a9a55b3",
+  "stops": [
+    {
+      "name": "Lund C",
+      "id": "9021012081216000",
+      "departure": {
+        "time": "2026-11-02T01:21:00Z",
+        "deviation": 0,
+        "passed": true,
+        "timePoint": true,
+        "observedTime": "2026-11-02T01:21:00Z"
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    },
+    {
+      "name": "Burlöv station",
+      "id": "9021012031031000",
+      "arrival": {
+        "time": "2026-11-02T01:27:00Z",
+        "deviation": -1,
+        "passed": true,
+        "timePoint": true,
+        "observedTime": "2026-11-02T01:26:00Z"
+      },
+      "departure": {
+        "time": "2026-11-02T01:27:00Z",
+        "deviation": 1,
+        "passed": true,
+        "timePoint": true,
+        "observedTime": "2026-11-02T01:28:00Z"
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Malmö C",
+      "id": "9021012080000000",
+      "arrival": {
+        "time": "2026-11-02T01:33:00Z",
+        "deviation": 0,
+        "passed": true,
+        "timePoint": true,
+        "observedTime": "2026-11-02T01:33:00Z"
+      },
+      "departure": {
+        "time": "2026-11-02T01:35:00Z",
+        "deviation": 1,
+        "passed": true,
+        "timePoint": true,
+        "observedTime": "2026-11-02T01:36:00Z"
+      },
+      "pos": "Spår 1b",
+      "scheduledPos": "Spår 1b"
+    },
+    {
+      "name": "Malmö Triangeln",
+      "id": "9021012080140000",
+      "arrival": {
+        "time": "2026-11-02T01:38:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T01:38:00Z",
+        "deviation": 1,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    },
+    {
+      "name": "Malmö Hyllie",
+      "id": "9021012080040000",
+      "arrival": {
+        "time": "2026-11-02T01:42:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T01:44:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1b",
+      "scheduledPos": "Spår 1b"
+    },
+    {
+      "name": "CPH Airport Kastrup",
+      "id": "9021012045006000",
+      "arrival": {
+        "time": "2026-11-02T01:55:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T02:02:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 12",
+      "scheduledPos": "Spår 12"
+    },
+    {
+      "name": "Tårnby",
+      "id": "9021012045008000",
+      "arrival": {
+        "time": "2026-11-02T02:04:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T02:05:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Ørestad",
+      "id": "9021012045005000",
+      "arrival": {
+        "time": "2026-11-02T02:07:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T02:08:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Köpenhamn H",
+      "id": "9021012045007000",
+      "arrival": {
+        "time": "2026-11-02T02:15:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T02:18:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 2",
+      "scheduledPos": "Spår 2"
+    },
+    {
+      "name": "Köpenhamn Nørreport",
+      "id": "9021012045012000",
+      "arrival": {
+        "time": "2026-11-02T02:20:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "departure": {
+        "time": "2026-11-02T02:21:00Z",
+        "deviation": -5,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 1",
+      "scheduledPos": "Spår 1"
+    },
+    {
+      "name": "Köpenhamn Østerport",
+      "id": "9021012045011000",
+      "arrival": {
+        "time": "2026-11-02T02:24:00Z",
+        "deviation": 0,
+        "passed": false,
+        "timePoint": true
+      },
+      "pos": "Spår 3",
+      "scheduledPos": "Spår 2"
+    }
+  ]
+}
