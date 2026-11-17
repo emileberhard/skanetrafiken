@@ -101,6 +101,7 @@ class Timing(_Serializable):
     expected: datetime | None
     delay_minutes: int | None
     time_omitted: bool
+    passed: bool | None
 
 
 @dataclass(frozen=True, slots=True)

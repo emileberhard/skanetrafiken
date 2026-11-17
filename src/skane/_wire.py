@@ -105,6 +105,7 @@ class Journeys(BaseModel):
 class Timing(BaseModel):
     time: AwareDatetime
     deviation: StrictInt | None = None
+    passed: bool | None = None
     canceled: bool = False
     timeOmitted: bool = False
 

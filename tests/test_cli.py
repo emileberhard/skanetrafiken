@@ -128,12 +128,21 @@ def test_leg_realtime_and_omitted_time(monkeypatch, capsys):
         "expected": None,
         "delayMinutes": None,
         "timeOmitted": True,
+        "passed": True,
     }
     assert second["arrival"]["expected"] == "2026-11-02T02:26:00+01:00"
     assert second["arrival"]["delayMinutes"] == -1
     monkeypatch.setattr(sys, "argv", ["skane", "leg", "leg-id"])
     cli.main()
     assert "--:-- (scheduled 02:21)" in capsys.readouterr().out
+
+
+def test_leg_tells_stops_the_vehicle_has_passed_from_those_ahead_and_untracked(monkeypatch, capsys):
+    raw = fixture("route-realtime.json")
+    del raw["stops"][4]["departure"]["deviation"], raw["stops"][4]["departure"]["passed"]
+    respond(monkeypatch, raw)
+    stops = invoke(monkeypatch, capsys, "leg", "leg-id", "--json")["stops"]
+    assert [stop["departure"]["passed"] for stop in stops[:5]] == [True, True, True, False, None]
 
 
 def test_recorded_cancellations_mark_only_the_cancelled_section(monkeypatch, capsys):

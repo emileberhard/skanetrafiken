@@ -83,7 +83,9 @@ def _resolve(query: str | Place, deadline: float) -> _Endpoint:
     return _resolve(exact[0], deadline)
 
 
-def _timing(scheduled: datetime, deviation: int | None, omitted: bool) -> Timing:
+def _timing(
+    scheduled: datetime, deviation: int | None, omitted: bool, passed: bool | None
+) -> Timing:
     delay = None if omitted else deviation
     expected = None if delay is None else scheduled + timedelta(minutes=delay)
     return Timing(
@@ -91,11 +93,12 @@ def _timing(scheduled: datetime, deviation: int | None, omitted: bool) -> Timing
         expected.astimezone(ZONE) if expected else None,
         delay,
         omitted,
+        passed,
     )
 
 
 def _stop_time(stop: _wire.StopTime) -> StopTime:
-    timing = _timing(stop.time, stop.deviation, stop.timeOmitted)
+    timing = _timing(stop.time, stop.deviation, stop.timeOmitted, None)
     return StopTime(
         id=stop.id2,
         name=stop.name,
@@ -203,7 +206,9 @@ def _place_ref(end: _Endpoint, stop: StopTime | None) -> PlaceRef:
 
 
 def _call_timing(call: _wire.Timing | None) -> Timing | None:
-    return None if call is None else _timing(call.time, call.deviation, call.timeOmitted)
+    if call is None:
+        return None
+    return _timing(call.time, call.deviation, call.timeOmitted, call.passed)
 
 
 def _vehicle_stop(stop: _wire.TripStop) -> VehicleStop:
